@@ -1,0 +1,8 @@
+d.bat
+npm-debug.log
+node_modules/
+docs-create
+todo.txt
+notes.txt
+coverage/
+.vscode/

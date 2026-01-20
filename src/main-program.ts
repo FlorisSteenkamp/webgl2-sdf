@@ -1,0 +1,160 @@
+import { Program } from './types/program.js';
+import { useTexture } from './webgl-utils/use-texture.js';
+import { setAttribute } from './webgl-utils/set-attribute.js';
+import { setUniform } from './webgl-utils/set-uniform.js';
+import { setUniformBlock } from './webgl-utils/set-uniform-block.js';
+import { GlContext } from './types/gl-context.js';
+import { prepareBuffers } from './prepare-buffers.js';
+import { TEX_WIDTH } from './tex-width.js';
+import { ROW_COUNT } from './row-count.js';
+
+
+const SEG_TEX_INDEX = 0;
+const CELL_TEX_INDEX = 1;
+const CROSS_TEX_INDEX = 2;
+
+
+function mainProgram(
+        glContext: GlContext,
+        programMain: Program,
+        resolution: 0.5|1,
+        psss: number[][][][],
+        viewbox: [number,number,number,number],
+        maxDistance: number,
+        sdfExponent = 1,
+        width: number,
+        height: number,
+        colCount: number,
+        cellSize: number,
+        inclInside: boolean,
+        inclOutside: boolean,
+        padCount: number,
+        stretch: number) {
+
+    const { gl } = glContext;
+
+    const vertices: number[] = [];
+    const x0 = 0;
+    const y0 = 0;
+    const x1 = 1/ROW_COUNT;
+    const y1 = 1/ROW_COUNT;
+
+    vertices.push(x0,y0, x1,y0, x0,y1);  // First triangle: (x0,y0), (x1,y0), (x0,y1)
+    vertices.push(x1,y0, x1,y1, x0,y1);  // Second triangle: (x1,y0), (x1,y1), (x0,y1)
+    const uvArr = new Float32Array(vertices);
+
+    const setUniform_ = setUniform(programMain);
+    const setAttribute_ = setAttribute(programMain);
+
+    const {
+        lineSegPtCoords_Arr, segIdxs_PerCell_Range_Arr,
+        closeCellIdxs_PerCell_Arr, closeCellIdxs_PerCell_Range_Arr,
+        crossCellIdxs_PerCell_Arr, crossCellIdxs_perCell_Range_Arr,
+        segIdxs_PerStrip_Range_Arr
+    } = prepareBuffers(
+        psss, width, height, colCount, cellSize, maxDistance,
+        padCount, resolution, viewbox, stretch
+    );
+
+    // Init/update attributes
+    setAttribute_(
+        'aUV', 2,  // size, i.e 2d - draw 2 values each time
+        gl.FLOAT, gl.STATIC_DRAW, uvArr
+    );
+
+    setAttribute_(
+        'aCrossIdxRangePerCell',
+        2,  // count
+        gl.INT, gl.STATIC_DRAW, crossCellIdxs_perCell_Range_Arr,
+        1  // instance division (once per instance)
+    );
+
+    setAttribute_(
+        'aCloseCellIdxRangePerCell',
+        2,  // count
+        gl.INT, gl.STATIC_DRAW, closeCellIdxs_PerCell_Range_Arr,
+        1  // instance division (once per instance)
+    );
+
+    // Init/update uniforms
+    setUniform_('2f', 'uWidthHeight', width, height);
+    setUniform_('1f', 'uMaxDistance', maxDistance);
+    setUniform_('1f', 'uExponent', sdfExponent);  // TODO
+    setUniform_('1i', 'uIncl', (inclInside ? 1 : 0) + (inclOutside ? 2 : 0));
+    setUniform_('1f', 'uStretch', stretch);  // TODO
+
+    setUniformBlock(programMain)('SegIdxRangePerCellBlock', 0, segIdxs_PerCell_Range_Arr);
+    setUniformBlock(programMain)('SegIdxRangePerStripBlock', 1, segIdxs_PerStrip_Range_Arr);
+
+    ///////////////////////////////////////
+    // Create buffer for line segment data
+    useTexture(glContext, SEG_TEX_INDEX, 'segs');
+    gl.texImage2D(  // really 1d
+        gl.TEXTURE_2D,
+        0,           // level - irrelevant
+        gl.RGBA32F,  // internalFormat - we're using 4 floats for the 2 line segment endpoints
+        lineSegPtCoords_Arr.length/4,  // width === number of lines
+        1,           // height - linear data texture so we only need height of 1
+        0,           // border - whatever
+        gl.RGBA,     // format
+        gl.FLOAT,    // it holds floats
+        lineSegPtCoords_Arr  // texture data
+    );
+    const segTexLoc = gl.getUniformLocation(programMain.program, "uSegs");
+    gl.uniform1i(segTexLoc, SEG_TEX_INDEX);
+    ///////////////////////////////////////////////
+
+    ///////////////////////////////////////////////
+    // Create buffer for close cell indexes per cell
+    useTexture(glContext, CELL_TEX_INDEX, 'closeCellIdxsPerCell');
+    gl.texImage2D(  // really 1d
+        gl.TEXTURE_2D,
+        0,           // level - irrelevant
+        gl.R32I,     // internalFormat - we're using 1 signed 32-bit int for indexes
+        TEX_WIDTH,   // width === number of indexes
+        closeCellIdxs_PerCell_Arr.length / TEX_WIDTH,
+        0,           // border - whatever
+        gl.RED_INTEGER,  // format
+        gl.INT,    // it holds ints
+        closeCellIdxs_PerCell_Arr  // texture data
+    );
+
+    const cellTexLoc = gl.getUniformLocation(programMain.program, "uCloseCellIdxs");
+    gl.uniform1i(cellTexLoc, CELL_TEX_INDEX);
+    ///////////////////////////////////////////////
+
+    ///////////////////////////////////////////////
+    // Create buffer for crossing cell indexes per cell
+    useTexture(glContext, CROSS_TEX_INDEX, 'crossCellIdxsPerCell');
+    gl.texImage2D(  // really 1d
+        gl.TEXTURE_2D,
+        0,           // level - irrelevant
+        gl.R32I,     // internalFormat - we're using 1 signed 32-bit int for indexes
+        TEX_WIDTH,   // width === number of indexes
+        crossCellIdxs_PerCell_Arr.length / TEX_WIDTH,  // height - linear data texture so we only need height of 1
+        0,           // border - whatever
+        gl.RED_INTEGER,  // format
+        gl.INT,    // it holds ints
+        crossCellIdxs_PerCell_Arr  // texture data
+    );
+    const crossTexLoc = gl.getUniformLocation(programMain.program, "uCrossCellIdxs");
+    gl.uniform1i(crossTexLoc, CROSS_TEX_INDEX);
+    ///////////////////////////////////////////////
+
+    if (stretch > 1) {
+        gl.enable(gl.SCISSOR_TEST);
+        gl.scissor(0, 0, width, height/stretch)
+    }
+
+    gl.viewport(0, 0, width, height);
+
+    // draw a square colCount * ROW_COUNT times - 6 vertics
+    gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, colCount*ROW_COUNT);
+
+    if (stretch > 1) {
+        gl.disable(gl.SCISSOR_TEST);
+    }
+}
+
+
+export { mainProgram }
