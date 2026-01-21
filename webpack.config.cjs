@@ -5,8 +5,8 @@ const path = require('path');
 
 
 const config_Basic = {
-    // mode: 'production',
-    mode: 'development',
+    mode: 'production',
+    // mode: 'development',
     entry: './src/index.ts',
     resolve: {
         extensions: [
@@ -48,7 +48,7 @@ const config_Basic = {
         // })
     ],
     output: {
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, 'browser'),
         library: { type: 'module' }
     },
     experiments: { outputModule: true }

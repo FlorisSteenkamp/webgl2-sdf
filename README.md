@@ -1,27 +1,23 @@
 WORK IN PROGRESS!!
 
-Bug reports, pull requests and ⭐⭐⭐⭐⭐s are welcome and appreciated!
-
 ## Overview
 
 A library to generate the signed distance transform (sdf) of an array of bezier
 curves, typically some some closed shape(s).
 
-* being *dozens of times faster* than ()[webgl-sdf-generator] real-time (60 fps)
-is easily achievable even for complex shapes
+* *dozens of times faster* than ()[webgl-sdf-generator] for real-time (60 fps)
+applications
 
 * drop-in replacement for ()[webgl-sdf-generator] with some additional options
-
-* written in TypeScript
 
 The bezier curves can be given in raw form or as an svg string (except arcs are
 not supported)
 
 ```typescript
-// some cubic bezier curve given by an array of its control points
-const cubic1 = [[6.4, 4.8], [15, 5], [1, 4], [10, 4]];
-const p2 = evaluate(cubic2,xs[0][1]);  //=> [7.6179261410151105, 4.822433357454532]
+
 ```
+
+Bug reports, pull requests and ⭐⭐⭐⭐⭐s are welcome and appreciated!
 
 ## Features
 
@@ -51,20 +47,10 @@ list of available functions.
 ```js
 import { fitQuadsToCubic } from 'flo-bezier3';
 
-// some cubic bezier curve given by an array of its control points
-const cubic = [[1, 1], [5.125, 8], [15.375, 0.875], [13.6875, 7.71875]];
-const quads = fitQuadsToCubic(cubic, 0.1); //=> [[[1, 1], [2.617431640625, 3.5152587890625], ...
-
-if (quads.length === 4) {
-    console.log('success! 😁');  // we should get to here!
-} else {
-    console.log('failure! 😥');  // ...and not here
-}
 ```
 
 ### Browsers - directly, without a bundler, using the pre-bundled minified .js file
 
-Please note that no tree shaking will take place in this case.
 
 ```html
 <!doctype html>
@@ -98,19 +84,7 @@ Webpack will be taken as an example here.
 Since your webpack config file might still use `CommonJS` you must rename 
 `webpack.config.js` to `webpack.config.cjs`.
 
-If you are using TypeScript:
-
-Since this is an [ESM only](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c)
-library you must use [resolve-typescript-plugin](https://www.npmjs.com/package/resolve-typescript-plugin) 
-(at least until webpack catches up with ESM?) in your `webpack.config.cjs` file.
-
-```cli
-npm install --save-dev resolve-typescript-plugin
-```
-
-and follow the instructions given at [resolve-typescript-plugin](https://www.npmjs.com/package/resolve-typescript-plugin).
-
-Additionally, follow this [guide](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c#how-can-i-make-my-typescript-project-output-esm).
+Follow this [guide](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c#how-can-i-make-my-typescript-project-output-esm).
 
 
 ## License
