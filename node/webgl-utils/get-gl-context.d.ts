@@ -6,5 +6,5 @@ import type { GlContext } from "../types/gl-context.js";
  * @param gl the `WebGL2RenderingContext` context to wrap
  * @param callback
  */
-declare function getWebGLContext<T>(gl: WebGL2RenderingContext): GlContext;
-export { getWebGLContext };
+declare function getWebGlContext(gl: WebGL2RenderingContext): GlContext;
+export { getWebGlContext };

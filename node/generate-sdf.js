@@ -1,4 +1,4 @@
-import { getWebGLContext } from './webgl-utils/get-gl-context.js';
+// import { getWebGLContext } from './webgl-utils/get-gl-context.js';
 import { main_Vertex } from './shaders/main.vertex.js';
 import { getMainFragment } from './shaders/main.fragment.js';
 import { initProgram } from './webgl-utils/use-program.js';
@@ -9,7 +9,7 @@ import { MAX_ASPECT_RATIO_BEFORE_STRETCH } from './max-aspect-ratio-before-stret
 // import { debugShaders } from './debug-shaders.js';
 const { ceil, min, max } = Math;
 /**
- *
+ * TODO
  * @param gl
  * @param psss
  * @param width
@@ -24,14 +24,12 @@ const { ceil, min, max } = Math;
  * @param channel
  * @param resolution
  */
-function generateIntoFramebuffer(gl, psss, width, height, viewbox, maxDistance, sdfExponent = 1, inclInside = true, inclOutside = true, 
-// framebuffer: WebGLFramebuffer | null,
-x = 0, y = 0, channel = 0, resolution = 0.5) {
+function generateIntoFramebuffer(glContext, psss, width, height, viewbox, maxDistance, sdfExponent = 1, inclInside = true, inclOutside = true, x = 0, y = 0, channel = 0, resolution = 0.5) {
     // debugShaders(gl);  // comment for production
     const psss_ = typeof psss === 'string'
         ? getPathsFromStr(psss)
         : psss;
-    const glContext = getWebGLContext(gl);
+    // const glContext = getWebGLContext(gl);
     const { onContextLoss } = glContext;
     let stretch = 1;
     const aspectRatio = width / height;
@@ -45,6 +43,7 @@ x = 0, y = 0, channel = 0, resolution = 0.5) {
     const colCount = ceil(width / cellSize);
     const padCount = 2 * ceil(min(maxDistance, maxDim) / cellSize / 2);
     const programMain = initProgram(glContext, `main${colCount}-${padCount}`, main_Vertex, getMainFragment(colCount, padCount));
+    const { gl } = glContext;
     gl.useProgram(programMain.program);
     mainProgram(glContext, programMain, resolution, psss_, viewbox, maxDistance, sdfExponent, width, height, colCount, cellSize, inclInside, inclOutside, padCount, stretch);
     // Handle context loss occurring during any of the above calls

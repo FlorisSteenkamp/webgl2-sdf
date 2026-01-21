@@ -8,6 +8,8 @@ interface Program {
     readonly attributes: { [index:string]: Attribute };
     readonly uniforms: { [index:string]: WebGLUniformLocation | null };
     readonly uniformBlocks: { [index:string]: UniformBlock };
+    readonly vertexShader: WebGLShader;
+    readonly fragmentShader: WebGLShader;
 }
 
 

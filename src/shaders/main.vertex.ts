@@ -5,7 +5,6 @@ const main_Vertex = /*glsl*/`#version 300 es
 precision highp float;
 
 uniform vec2 uWidthHeight;
-uniform float uStretch;
 in vec2 aUV;
 in ivec2 aCloseCellIdxRangePerCell;
 in ivec2 aCrossIdxRangePerCell;

@@ -50,8 +50,6 @@ function calcCircs() {
         ranges.sort((a,b) => (a.from - b.from));
     }
 
-
-
     return ranges;
 }
 

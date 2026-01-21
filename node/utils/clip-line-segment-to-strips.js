@@ -6,7 +6,7 @@ const { floor, ceil } = Math;
  * * modifies strips by adding line segments to each strip
  * * size/count *must* be a power of 2
  *
- * @param count the number of strips
+ * @param strips array of strips - each contains an array line segments
  * @param height the height of a strip
  * @param seg the line segment (array of 2 points)
  */
@@ -66,7 +66,7 @@ function clipLineSegmentToStrips(strips, height, seg) {
         // if we're past the line endpoint
         if ((tX > 1 || dX === 0) && tY > 1) {
             const v = floor(p1[1] / cellSize);
-            strips[v]?.lineSegs.push([[x, y], p1]);
+            strips[v]?.push([[x, y], p1]);
             break;
         }
         if (((xX >= 0 && (x0 !== 0 || dX !== 0)) || xY <= 0 || xY >= height)) {
@@ -81,70 +81,18 @@ function clipLineSegmentToStrips(strips, height, seg) {
             else {
                 const v = fY(y / cellSize) - (btt ? 0 : 1); // previous v
                 const seg_ = [[x, y], ps[i]];
-                strips[v]?.lineSegs.push(seg_);
+                strips[v]?.push(seg_);
                 break;
             }
         }
         // previous v
         const v = fY(y / cellSize) - (btt ? 0 : 1);
-        strips[v]?.lineSegs.push([[x, y], [xX, xY]]);
+        strips[v]?.push([[x, y], [xX, xY]]);
         // update current position
         x = xX;
         y = xY;
     }
 }
 export { clipLineSegmentToStrips };
-// Quokka tests - https://www.desmos.com/calculator/uyqsdkviih
-// import { createEmptyStrips } from "./create-empty-strips";
-// {
-//     const strips = createEmptyStrips(8);
-//     const seg = [[0, 100], [0, 400]];
-//     toDesmosStr(seg);
-//     clipLineSegmentToStrips(strips, 512, seg);
-//     testAllEmptyExcept(strips,[1,2,3,4,5,6]);
-// }
-// {
-//     const strips = createEmptyStrips(8);
-//     const seg = [[83, 166], [-90, 440]];
-//     toDesmosStr(seg);
-//     clipLineSegmentToStrips(strips, 512, seg);
-//     testAllEmptyExcept(strips,[4,5,6]);
-// }
-// {
-//     const strips = createEmptyStrips(8);
-//     const seg = [[-570, 236], [-392, 546]];
-//     toDesmosStr(seg);
-//     clipLineSegmentToStrips(strips, 512, seg);
-//     testAllEmptyExcept(strips,[3,4,5,6,7]);
-// }
-// {
-//     const strips = createEmptyStrips(8);
-//     const seg = [[-462, 632], [-152, 611]];
-//     toDesmosStr(seg);
-//     clipLineSegmentToStrips(strips, 512, seg);
-//     testAllEmptyExcept(strips,[]);
-// }
-// function toDesmosStr(seg: number[][]) {
-//     const [[x0,y0],[x1,y1]] = seg;
-//     return `\\left(\\left(1-t\\right)\\cdot${x0.toFixed(2)}+t\\cdot\\left(${x1.toFixed(2)}\\right),\\left(1-t\\right)\\cdot${y0.toFixed(2)}+t\\cdot${y1.toFixed(2)}\\right)`;
-// }
-// function testAllEmptyExcept(
-//         strips: Strip[],
-//         exceptions: number[]) {
-//     for (let i=0; i<strips.length; i++) {
-//         const strip = strips[i];
-//         const idx = exceptions.findIndex(v => v === i);
-//         const exception = exceptions[idx];
-//         const len = strip.lineSegs.length;
-//         if (exception === undefined) {
-//             if (len !== 0) {
-//                 throw new Error(`Strip ${i} must be empty`);
-//             }
-//         } else {
-//             if (len !== 1) {
-//                 throw new Error(`Strip ${i} must contain 1 segments, found ${len}`);
-//             }
-//         }
-//     }
-// }
+var a = [[1, 1], [1, 1]];
 //# sourceMappingURL=clip-line-segment-to-strips.js.map

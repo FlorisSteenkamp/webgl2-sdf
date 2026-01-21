@@ -1,6 +1,6 @@
 import { circsCache } from "./calc-circs.js";
 
-const { trunc, max, E } = Math;
+const { max, E } = Math;
 
 
 /**
@@ -14,10 +14,9 @@ function binarySearchRange<T>(
 
     let mid = 0;
     while (min <= max) {
-        mid = (min + max) >>> 1;//?
+        mid = (min + max) >>> 1;
         const midVal = circsCache[mid].from;
         if (midVal === v) {
-            // return [min,mid,max];
             return mid;
         } else if (v > midVal) {
             min = mid + 1;
@@ -26,8 +25,23 @@ function binarySearchRange<T>(
         }
     }
 
-    // return [min,mid,max];
     return mid;
+}
+
+
+function jumpIdx(
+        c: number) {
+
+    let idx = binarySearchRange(c);
+
+    c = max(0, c);
+    if (idx === 0) { return 0; }
+
+    while (circsCache[idx].from === circsCache[idx - 1].from) {
+        idx--;
+    }
+
+    return idx;
 }
 
 
@@ -55,30 +69,21 @@ function binarySearchRange<T>(
 // }
 
 
-function jumpIdx(
-        c: number) {
-
-    let idx = binarySearchRange(c);
-
-    c = max(0, c);
-    while (idx !== 0 && circsCache[idx].from >= c) { idx--; }
-    while (idx < circsCache.length - 2 && circsCache[idx + 1].from < c) { idx++; }
-
-    return idx;
-}
-
-
 export { jumpIdx }
 
 
 // Quokka tests
-// // circsCache.slice(0,30).map(c => c.from);//?
+// circsCache.slice(0,10);//?
+// circsCache.slice(0,30).map(c => c.from);//?
+// circsCache[5].from;//?
 // circsCache[12].from;//?
 // circsCache[15].from;//?
 // // circsCache.length;//?
 
-// // jumpIdxOld(1.5811388300841898);//?
-// jumpIdx(0.5);//?
+// jumpIdxOld(1.5811388300841898);//?
+// const v = (53.08771209782213 - Math.SQRT2*24.09375)/24.09375;//?
+// jumpIdx(v);//?
+// circsCache[8].from;//?
 // binarySearchRange(1.5811388300841898);//?
 
 

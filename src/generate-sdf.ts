@@ -1,4 +1,4 @@
-import { getWebGLContext } from './webgl-utils/get-gl-context.js';
+// import { getWebGLContext } from './webgl-utils/get-gl-context.js';
 import { main_Vertex } from './shaders/main.vertex.js';
 import { getMainFragment } from './shaders/main.fragment.js';
 import { initProgram } from './webgl-utils/use-program.js';
@@ -6,13 +6,14 @@ import { mainProgram } from './main-program.js';
 import { ROW_COUNT } from './row-count.js';
 import { getPathsFromStr } from './svg/get-paths-from-str.js';
 import { MAX_ASPECT_RATIO_BEFORE_STRETCH } from './max-aspect-ratio-before-stretch.js';
+import { GlContext } from './types/gl-context.js';
 // import { debugShaders } from './debug-shaders.js';
 
 const { ceil, min, max } = Math;
 
 
 /**
- * 
+ * TODO
  * @param gl 
  * @param psss 
  * @param width 
@@ -28,7 +29,7 @@ const { ceil, min, max } = Math;
  * @param resolution 
  */
 function generateIntoFramebuffer(
-        gl: WebGL2RenderingContext,
+        glContext: GlContext,
         psss: (number[][])[][] | string,
         width: number,
         height: number,
@@ -37,7 +38,6 @@ function generateIntoFramebuffer(
         sdfExponent = 1,
         inclInside = true,
         inclOutside = true,
-        // framebuffer: WebGLFramebuffer | null,
         x = 0, y = 0,
         channel = 0,
         resolution: 0.5|1 = 0.5) {
@@ -48,7 +48,7 @@ function generateIntoFramebuffer(
         ? getPathsFromStr(psss)
         : psss;
 
-    const glContext = getWebGLContext(gl);
+    // const glContext = getWebGLContext(gl);
 
     const { onContextLoss } = glContext;
 
@@ -71,6 +71,8 @@ function generateIntoFramebuffer(
         glContext, `main${colCount}-${padCount}`,
         main_Vertex, getMainFragment(colCount, padCount)
     );
+
+    const { gl } = glContext;
 
     gl.useProgram(programMain.program);
     mainProgram(

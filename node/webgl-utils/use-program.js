@@ -21,10 +21,20 @@ function initProgram(glContext, name, vert, frag) {
     const uniforms = {};
     const uniformBlocks = {};
     const program = gl.createProgram();
-    gl.attachShader(program, compileShader(gl, vert, gl.VERTEX_SHADER));
-    gl.attachShader(program, compileShader(gl, frag, gl.FRAGMENT_SHADER));
+    const vertexShader = compileShader(gl, vert, gl.VERTEX_SHADER);
+    const fragmentShader = compileShader(gl, frag, gl.FRAGMENT_SHADER);
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
-    programs[name] = { gl, program, attributes, uniforms, uniformBlocks };
+    programs[name] = {
+        gl,
+        program,
+        attributes,
+        uniforms,
+        uniformBlocks,
+        vertexShader,
+        fragmentShader
+    };
     return programs[name];
 }
 export { initProgram };

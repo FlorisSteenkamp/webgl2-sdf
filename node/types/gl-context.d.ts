@@ -22,7 +22,6 @@ interface GlContext {
     readonly programs: {
         [index: string]: Program;
     };
-    readonly framebufferStack: WebGLFramebuffer[];
     readonly onContextLoss: () => void;
 }
 export type { GlContext };

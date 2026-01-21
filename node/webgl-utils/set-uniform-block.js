@@ -21,10 +21,8 @@ function setUniformBlock(program_) {
             gl.bindBuffer(gl.UNIFORM_BUFFER, uniformBlock.buf);
         }
         const { buf } = uniformBlock;
-        gl.bufferData(gl.UNIFORM_BUFFER, buffer, gl.DYNAMIC_DRAW);
-        // gl.bindBuffer(gl.UNIFORM_BUFFER, null);
+        gl.bufferData(gl.UNIFORM_BUFFER, buffer, gl.STATIC_DRAW);
         gl.bindBufferBase(gl.UNIFORM_BUFFER, bindingPoint, buf);
-        // gl.bindBufferRange(gl.UNIFORM_BUFFER, bindingPoint, ubo, 0, sizeInBytes);
     };
 }
 export { setUniformBlock };

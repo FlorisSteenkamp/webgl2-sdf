@@ -5,10 +5,9 @@ import { createEmptyGrid } from './utils/create-empty-grid.js';
 import { findCrossingCells } from './utils/find-crossing-cells.js';
 import { TEX_WIDTH } from './tex-width.js';
 import { ROW_COUNT } from './row-count.js';
-import { createEmptyStrips } from './utils/create-empty-strips.js';
 import { clipLineSegmentToStrips } from './utils/clip-line-segment-to-strips.js';
 import { mapToViewbox } from './utils/map-to-viewbox.js';
-// import { sum } from './utils/sum.js';
+// import { sum } from './utils/sum.js';  // testing
 
 
 function prepareBuffers(
@@ -28,11 +27,12 @@ function prepareBuffers(
 
     const lineSegs = bezierCurvesToLineSegs(psss_, resolution);
     const grid = createEmptyGrid(colCount, padCount);
-    const strips = createEmptyStrips();
+    const strips = new Array(ROW_COUNT).fill(undefined).map(v => []);
+
     for (let i=0; i<lineSegs.length; i++) {
         const seg = lineSegs[i];
         // Split the line segment into multiple segments that fit within grid cells
-        clipLineSegmentToGrid(grid, width, height, colCount, cellSize, seg, padCount);  // add segments to grid
+        clipLineSegmentToGrid(grid, width, height, cellSize, seg, padCount);  // add segments to grid
         clipLineSegmentToStrips(strips, height, seg);  // add segments to strips
     }
 
@@ -96,8 +96,7 @@ function prepareBuffers(
     // Add line segs from strips
     const segIdxs_PerStrip_Range: [number,number][] = [];
     for (let i=0; i<ROW_COUNT; i++) {
-        const strip = strips[i];
-        const { lineSegs } = strip;
+        const lineSegs = strips[i];
 
         //////////
         const L = lineSegs.length;

@@ -20,21 +20,17 @@ function clipLineSegmentToGrid(
         grid: Cell[][],
         width: number,
         height: number,
-        colCount: number,
         cellSize: number,
         seg: number[][],
         padCount: number): void {
     
-    /** `cellSize` *must* be a power of two */
-    // const cellSize = width/ROW_COUNT;
-
     const padding = cellSize*padCount;
 
     const [[x0,y0],[x1,y1]] = seg;
 
     const paddedWidth = width + padding;
     const paddedHeight = height + padding;
-    // TODO - investigate lines on edge and corners - ps could be length 4!!
+
     const ps = segBoxX(seg, [[-padding,-padding],[paddedWidth,paddedHeight]]);
 
     const p0IsInBox = x0 > -padding && x0 < paddedWidth && y0 > -padding && y0 < paddedHeight;

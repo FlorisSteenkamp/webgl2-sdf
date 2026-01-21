@@ -12,5 +12,7 @@ interface Program {
     readonly uniformBlocks: {
         [index: string]: UniformBlock;
     };
+    readonly vertexShader: WebGLShader;
+    readonly fragmentShader: WebGLShader;
 }
 export { Program };

@@ -11,14 +11,11 @@ const { floor, ceil } = Math;
  * @param height
  * @param seg the line segment (array of 2 points)
  */
-function clipLineSegmentToGrid(grid, width, height, colCount, cellSize, seg, padCount) {
-    /** `cellSize` *must* be a power of two */
-    // const cellSize = width/ROW_COUNT;
+function clipLineSegmentToGrid(grid, width, height, cellSize, seg, padCount) {
     const padding = cellSize * padCount;
     const [[x0, y0], [x1, y1]] = seg;
     const paddedWidth = width + padding;
     const paddedHeight = height + padding;
-    // TODO - investigate lines on edge and corners - ps could be length 4!!
     const ps = segBoxX(seg, [[-padding, -padding], [paddedWidth, paddedHeight]]);
     const p0IsInBox = x0 > -padding && x0 < paddedWidth && y0 > -padding && y0 < paddedHeight;
     const p1IsInBox = x1 > -padding && x1 < paddedWidth && y1 > -padding && y1 < paddedHeight;

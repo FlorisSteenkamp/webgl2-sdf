@@ -10,5 +10,5 @@ import type { Cell } from "../types/cell.js";
  * @param height
  * @param seg the line segment (array of 2 points)
  */
-declare function clipLineSegmentToGrid(grid: Cell[][], width: number, height: number, colCount: number, cellSize: number, seg: number[][], padCount: number): void;
+declare function clipLineSegmentToGrid(grid: Cell[][], width: number, height: number, cellSize: number, seg: number[][], padCount: number): void;
 export { clipLineSegmentToGrid };

@@ -1,11 +1,10 @@
 import type { Cell } from "../types/cell.js";
 import { ROW_COUNT } from "../row-count.js";
 import { circsCache } from "./calc-circs.js";
-import { distanceSegToP } from "./distance-seg-to-p.js";
 import { jumpIdx } from "./jump-idx.js";
 
 
-const { min, SQRT2 } = Math;
+const { min, max, SQRT2 } = Math;
 
 
 function findCloseCells(
@@ -44,57 +43,47 @@ function findCloseCellsFor(
         // reduce current circle search range since we moved one square
         let k = jumpIdx((_minD - SQRT2*cellSize) / cellSize);
         let minD = Number.POSITIVE_INFINITY;
-        while (k < circsCache.length) {
-            const from = circsCache[k].from;
+        while (true) {
+            if (k >= circsCache.length) {
+                minD = cellSize*(circsCache[circsCache.length - 1].from - SQRT2);
+                break;
+            }
+
+            const { u, v, from } = circsCache[k];
 
             // `SQRT2` to account for diagonal
             if (cellSize*from > maxDistance + SQRT2*cellSize) {
+                minD = cellSize*(from - 2*SQRT2);
                 break;
             }
 
-            // uncomment loop below to search all equidistant squares
-            // while (circsCache?.[k].from === from) {
-                const { u, v } = circsCache[k];
-                const u_ = u + i;
-                const v_ = v + j;
-                if (u_ < 0 || u_ >= colCount + 2*padCount ||
-                    v_ < 0 || v_ >= ROW_COUNT + 2*padCount) {
+            const u_ = u + i;
+            const v_ = v + j;
+            if (u_ < 0 || u_ >= colCount + 2*padCount ||
+                v_ < 0 || v_ >= ROW_COUNT + 2*padCount) {
 
-                    k++; continue;
-                }
+                k++; continue;
+            }
 
-                const { lineSegs } = grid[u_][v_];
-                for (let l=0; l<lineSegs.length; l++) {
-                    // center of square
-                    const c = [(i - padCount + 0.5)*cellSize, (j - padCount + 0.5)*cellSize];
-                    const d = distanceSegToP(lineSegs[l], c);
-                    if (d < minD) {
-                        minD = d;
-                    }
-                }
+            const { lineSegs } = grid[u_][v_];
 
-                k++;
-            // }
-
-            if (minD !== Number.POSITIVE_INFINITY) {
+            if (lineSegs.length > 0) {
+                minD = cellSize*(from - SQRT2);
                 break;
             }
+
+            k++;
         }
 
-        if (minD === Number.POSITIVE_INFINITY) {
-            return min(
-                maxDistance + SQRT2*cellSize,
-                cellSize * circsCache[circsCache.length - 1].from
-            );
-        }
 
         const { closeCells } = grid[i][j];
-        let l = jumpIdx((_minD - 2*SQRT2*cellSize) / cellSize);
+
+        let l = max(0, k - 1);
         while (l < circsCache.length) {
             const { from, u, v } = circsCache[l];
 
-            // `SQRT2` to account for diagonal
-            if (cellSize*from > min(minD, maxDistance) + SQRT2*cellSize) {
+            // `SQRT2` to account for diagonal (times 2 since we minused it off earlier)
+            if (cellSize*from > min(minD, maxDistance) + 2*SQRT2*cellSize) {
                 break;
             }
 
@@ -120,52 +109,3 @@ function findCloseCellsFor(
 
 
 export { findCloseCells }
-
-
-// Quokka tests
-// const grid: Cell[][] = [
-//     [
-//         { u: 0, v: 0, lineSegs: [], closeCells: [], crossingCells: [] },
-//         { u: 0, v: 1, lineSegs: [], closeCells: [], crossingCells: [] },
-//         { u: 0, v: 2, lineSegs: [], closeCells: [], crossingCells: [] },
-//         { u: 0, v: 3, lineSegs: [], closeCells: [], crossingCells: [] }
-//     ],
-//     [
-//         { u: 1, v: 0, lineSegs: [], closeCells: [], crossingCells: [] },
-//         {
-//             u: 1, v: 1,
-//             lineSegs: [[[175, 163], [175, 355]]],
-//             closeCells: [], crossingCells: []
-//         },
-//         {
-//             u: 1, v: 2,
-//             lineSegs: [[[175, 355], [335, 355]]],
-//             closeCells: [], crossingCells: []
-//         },
-//         { u: 1, v: 3, lineSegs: [], closeCells: [], crossingCells: [] }
-//     ],
-//     [
-//         { u: 2, v: 0, lineSegs: [], closeCells: [], crossingCells: [] },
-//         {
-//             u: 2, v: 1,
-//             lineSegs: [[[335, 163], [175, 163]]],
-//             closeCells: [], crossingCells: []
-//         },
-//         {
-//             u: 2, v: 2,
-//             lineSegs: [[[335, 355], [335, 163]]],
-//             closeCells: [], crossingCells: []
-//         },
-//         { u: 2, v: 3, lineSegs: [], closeCells: [], crossingCells: [] }
-//     ],
-//     [
-//         { u: 3, v: 0, lineSegs: [], closeCells: [], crossingCells: [] },
-//         { u: 3, v: 1, lineSegs: [], closeCells: [], crossingCells: [] },
-//         { u: 3, v: 2, lineSegs: [], closeCells: [], crossingCells: [] },
-//         { u: 3, v: 3, lineSegs: [], closeCells: [], crossingCells: [] }
-//     ]
-// ];
-
-// findCloseCells(grid);
-// const v = grid.map(cells => cells.map(c => ({ u: c.u, v: c.v, closeCells: c.closeCells })));
-// v;//?

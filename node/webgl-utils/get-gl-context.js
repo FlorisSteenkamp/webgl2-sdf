@@ -6,7 +6,7 @@ const cache = new WeakMap();
  * @param gl the `WebGL2RenderingContext` context to wrap
  * @param callback
  */
-function getWebGLContext(gl) {
+function getWebGlContext(gl) {
     {
         const glContext = cache.get(gl);
         if (glContext) {
@@ -15,29 +15,26 @@ function getWebGLContext(gl) {
     }
     const programs = {};
     const textures = {};
-    const framebufferStack = [];
     gl.canvas.addEventListener('webglcontextlost', e => {
-        handleContextLoss();
+        onContextLoss();
         e.preventDefault();
     }, false);
     const glContext = {
         gl,
-        onContextLoss: handleContextLoss,
+        onContextLoss,
         textures,
-        programs,
-        framebufferStack
+        programs
     };
     cache.set(gl, glContext);
     return glContext;
     ////////////////////////
-    function handleContextLoss() {
+    function onContextLoss() {
         deleteAllProps(programs);
         deleteAllProps(textures);
-        framebufferStack.length = 0;
     }
 }
 function deleteAllProps(o) {
     Object.keys(o).forEach(key => { delete o[key]; });
 }
-export { getWebGLContext };
+export { getWebGlContext };
 //# sourceMappingURL=get-gl-context.js.map

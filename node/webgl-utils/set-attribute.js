@@ -26,7 +26,7 @@ function setAttribute(program) {
     return (name, size, type, usage, data, instancingDivisor = 0, stride = 0, offset = 0) => {
         const { gl, attributes } = program;
         const attr = attributes[name] = attributes[name] ?? {
-            buf: gl.createBuffer(), // TODO should we destroy our buffers?
+            buf: gl.createBuffer(),
             loc: gl.getAttribLocation(program.program, name),
             data: null
         };

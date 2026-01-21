@@ -81,7 +81,6 @@ function mainProgram(
     setUniform_('1f', 'uMaxDistance', maxDistance);
     setUniform_('1f', 'uExponent', sdfExponent);  // TODO
     setUniform_('1i', 'uIncl', (inclInside ? 1 : 0) + (inclOutside ? 2 : 0));
-    setUniform_('1f', 'uStretch', stretch);  // TODO
 
     setUniformBlock(programMain)('SegIdxRangePerCellBlock', 0, segIdxs_PerCell_Range_Arr);
     setUniformBlock(programMain)('SegIdxRangePerStripBlock', 1, segIdxs_PerStrip_Range_Arr);
