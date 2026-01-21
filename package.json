@@ -2,7 +2,7 @@
     "name": "webgl2-sdf",
     "sideEffects": false,
     "description": "Fast sdf generator from bezier curves or svg string.",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "author": {
         "name": "Floris Steenkamp"
     },
