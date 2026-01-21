@@ -1,4 +1,4 @@
-import { segStripX } from "./seg-strip-x";
+import { segStripX } from "./seg-strip-x.js";
 const { floor, ceil } = Math;
 /**
  * Clips a line segment to strip boundaries and returns multiple segments.

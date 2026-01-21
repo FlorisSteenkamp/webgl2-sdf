@@ -1,6 +1,5 @@
-import type { Cell } from "../types/cell";
-import { ROW_COUNT } from "../row-count";
-import { segBoxX } from "./seg-box-x";
+import type { Cell } from "../types/cell.js";
+import { segBoxX } from "./seg-box-x.js";
 
 
 const { floor, ceil } = Math;

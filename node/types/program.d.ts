@@ -1,5 +1,5 @@
-import type { Attribute } from "./attribute";
-import type { UniformBlock } from "../webgl-utils/uniform-block";
+import type { Attribute } from "./attribute.js";
+import type { UniformBlock } from "../webgl-utils/uniform-block.js";
 interface Program {
     readonly gl: WebGL2RenderingContext;
     readonly program: WebGLProgram;

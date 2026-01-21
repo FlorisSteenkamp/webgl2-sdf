@@ -1,4 +1,4 @@
-import { ROW_COUNT } from "../row-count";
+import { ROW_COUNT } from "../row-count.js";
 const cache = {};
 function getMainFragment(colCount, padCount) {
     const fragment = cache[1024 * colCount + padCount];

@@ -1,8 +1,8 @@
-import type { Program } from "../types/program";
-import type { Attribute } from "../types/attribute";
-import type { UniformBlock } from "./uniform-block";
-import type { GlContext } from "../types/gl-context";
-import { compileShader } from "./compile-shader";
+import type { Program } from "../types/program.js";
+import type { Attribute } from "../types/attribute.js";
+import type { UniformBlock } from "./uniform-block.js";
+import type { GlContext } from "../types/gl-context.js";
+import { compileShader } from "./compile-shader.js";
 
 
 /**

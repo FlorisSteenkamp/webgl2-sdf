@@ -1,6 +1,6 @@
-import { MAX_ASPECT_RATIO_BEFORE_STRETCH } from '../max-aspect-ratio-before-stretch';
-import { ROW_COUNT } from '../row-count';
-import { len } from '../vector/len';
+import { MAX_ASPECT_RATIO_BEFORE_STRETCH } from '../max-aspect-ratio-before-stretch.js';
+import { ROW_COUNT } from '../row-count.js';
+import { len } from '../vector/len.js';
 /**
  * Represents the max distance (in cell side length units) from one corner of
  * the viewbox to the opposing corner.

@@ -1,5 +1,5 @@
-import { ROW_COUNT } from "../row-count";
-import { Strip } from "../types/strip";
+import { ROW_COUNT } from "../row-count.js";
+import { Strip } from "../types/strip.js";
 
 
 /**

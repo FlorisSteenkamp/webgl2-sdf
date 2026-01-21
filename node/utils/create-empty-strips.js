@@ -1,4 +1,4 @@
-import { ROW_COUNT } from "../row-count";
+import { ROW_COUNT } from "../row-count.js";
 /**
  *
  * @param count the number of strips

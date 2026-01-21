@@ -1,6 +1,6 @@
-import type { Texture } from "../types/texture";
-import type { Program } from "../types/program";
-import type { GlContext } from "../types/gl-context";
+import type { Texture } from "../types/texture.js";
+import type { Program } from "../types/program.js";
+import type { GlContext } from "../types/gl-context.js";
 
 
 const cache = new WeakMap<WebGL2RenderingContext, GlContext>();

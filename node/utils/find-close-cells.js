@@ -1,7 +1,7 @@
-import { ROW_COUNT } from "../row-count";
-import { circsCache } from "./calc-circs";
-import { distanceSegToP } from "./distance-seg-to-p";
-import { jumpIdx } from "./jump-idx";
+import { ROW_COUNT } from "../row-count.js";
+import { circsCache } from "./calc-circs.js";
+import { distanceSegToP } from "./distance-seg-to-p.js";
+import { jumpIdx } from "./jump-idx.js";
 const { min, SQRT2 } = Math;
 function findCloseCells(grid, colCount, cellSize, maxDistance, padCount) {
     const findCloseCellsFor_ = findCloseCellsFor(grid, colCount, cellSize, maxDistance, padCount);

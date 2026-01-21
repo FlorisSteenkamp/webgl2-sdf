@@ -1,4 +1,4 @@
-import { segBoxX } from "./seg-box-x";
+import { segBoxX } from "./seg-box-x.js";
 const { floor, ceil } = Math;
 /**
  * Clips a line segment to grid boundaries and returns multiple segments.

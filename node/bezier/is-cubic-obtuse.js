@@ -1,5 +1,5 @@
-import { fromToVec } from '../vector/from-to-vec';
-import { dot } from "../vector/dot";
+import { fromToVec } from '../vector/from-to-vec.js';
+import { dot } from "../vector/dot.js";
 /**
  * Returns `true` if the given cubic bezier is obtuse, `false` otherwise (i.e.
  * `false` if acute).

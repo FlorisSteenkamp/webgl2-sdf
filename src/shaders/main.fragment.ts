@@ -1,4 +1,4 @@
-import { ROW_COUNT } from "../row-count"
+import { ROW_COUNT } from "../row-count.js";
 
 
 const cache: { [padCount_times_colCount: number]: string } = {};

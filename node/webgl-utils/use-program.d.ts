@@ -1,5 +1,5 @@
-import type { Program } from "../types/program";
-import type { GlContext } from "../types/gl-context";
+import type { Program } from "../types/program.js";
+import type { GlContext } from "../types/gl-context.js";
 /**
  * Initiates a WebGL2 program by:
  *

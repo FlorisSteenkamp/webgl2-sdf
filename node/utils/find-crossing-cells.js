@@ -1,4 +1,4 @@
-import { ROW_COUNT } from "../row-count";
+import { ROW_COUNT } from "../row-count.js";
 // TODO - simplify?
 // TODO - could be made much faster by also checking intersections here
 // and passing the result to the next cell

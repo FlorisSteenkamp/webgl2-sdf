@@ -1,5 +1,5 @@
-import { ROW_COUNT } from "../row-count";
-import type { Cell } from "../types/cell";
+import { ROW_COUNT } from "../row-count.js";
+import type { Cell } from "../types/cell.js";
 
 
 // TODO - simplify?

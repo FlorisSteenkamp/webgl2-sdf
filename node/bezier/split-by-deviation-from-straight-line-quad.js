@@ -1,7 +1,7 @@
 import { getDistanceToLineFunction } from '../utils/get-distance-to-line-function.js';
-import { evalDeCasteljau } from './eval-de-casteljau';
-import { fromTo } from './from-to/from-to';
-import { isQuadObtuse } from './is-quad-obtuse';
+import { evalDeCasteljau } from './eval-de-casteljau.js';
+import { fromTo } from './from-to/from-to.js';
+import { isQuadObtuse } from './is-quad-obtuse.js';
 const { abs } = Math;
 /**
  * Split the given quadratic bezier curve into pieces (given as an array of

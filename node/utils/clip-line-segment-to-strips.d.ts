@@ -1,4 +1,4 @@
-import type { Strip } from "../types/strip";
+import type { Strip } from "../types/strip.js";
 /**
  * Clips a line segment to strip boundaries and returns multiple segments.
  *

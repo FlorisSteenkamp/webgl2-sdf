@@ -1,6 +1,6 @@
-import { Program } from "../types/program";
-import { GLattrType } from "../types/gl-type";
-import { GLusage } from "../types/gl-usage";
+import { Program } from "../types/program.js";
+import { GLattrType } from "../types/gl-type.js";
+import { GLusage } from "../types/gl-usage.js";
 /**
  *
  * @param name name used in glsl shaders

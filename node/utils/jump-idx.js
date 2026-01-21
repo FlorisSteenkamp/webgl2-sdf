@@ -1,4 +1,4 @@
-import { circsCache } from "./calc-circs";
+import { circsCache } from "./calc-circs.js";
 const { trunc, max, E } = Math;
 /**
  * @param v

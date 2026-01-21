@@ -1,5 +1,5 @@
-import { getMainFragment } from "./shaders/main.fragment";
-import { main_Vertex } from "./shaders/main.vertex";
+import { getMainFragment } from "./shaders/main.fragment.js";
+import { main_Vertex } from "./shaders/main.vertex.js";
 
 
 /**

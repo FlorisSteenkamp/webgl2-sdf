@@ -1,4 +1,4 @@
-import { Strip } from "../types/strip";
+import { Strip } from "../types/strip.js";
 /**
  *
  * @param count the number of strips

@@ -1,5 +1,5 @@
-import { Program } from "../types/program";
-import { UniformType } from "./uniform-type";
+import { Program } from "../types/program.js";
+import { UniformType } from "./uniform-type.js";
 
 
 function setUniform(

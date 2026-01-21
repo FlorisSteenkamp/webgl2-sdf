@@ -1,5 +1,5 @@
-import type { Strip } from "../types/strip";
-import { segStripX } from "./seg-strip-x";
+import type { Strip } from "../types/strip.js";
+import { segStripX } from "./seg-strip-x.js";
 
 
 const { floor, ceil } = Math;

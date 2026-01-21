@@ -1,4 +1,4 @@
-import { compileShader } from "./compile-shader";
+import { compileShader } from "./compile-shader.js";
 /**
  * Initiates a WebGL2 program by:
  *

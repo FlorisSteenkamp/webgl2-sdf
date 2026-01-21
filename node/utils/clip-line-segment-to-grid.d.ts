@@ -1,4 +1,4 @@
-import type { Cell } from "../types/cell";
+import type { Cell } from "../types/cell.js";
 /**
  * Clips a line segment to grid boundaries and returns multiple segments.
  *

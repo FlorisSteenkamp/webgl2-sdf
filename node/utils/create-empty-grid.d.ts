@@ -1,4 +1,4 @@
-import { Cell } from "../types/cell";
+import { Cell } from "../types/cell.js";
 /**
  *
  * @param colCount

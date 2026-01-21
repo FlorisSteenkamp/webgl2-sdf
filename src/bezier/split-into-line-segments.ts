@@ -1,7 +1,7 @@
-import { evalDeCasteljau } from './eval-de-casteljau';
-import { splitByDeviationFromStraighLine_Cubic_Crude } from './split-by-deviation-from-straight-line-cubic';
+import { evalDeCasteljau } from './eval-de-casteljau.js';
+import { splitByDeviationFromStraighLine_Cubic_Crude } from './split-by-deviation-from-straight-line-cubic.js';
 // import { splitByDeviationFromStraighLine_Cubic_Precise } from './split-by-deviation-from-straight-line-cubic';
-import { splitByDeviationFromStraighLine_Quad } from './split-by-deviation-from-straight-line-quad';
+import { splitByDeviationFromStraighLine_Quad } from './split-by-deviation-from-straight-line-quad.js';
 
 
 /**

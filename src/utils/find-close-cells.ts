@@ -1,8 +1,8 @@
-import type { Cell } from "../types/cell";
-import { ROW_COUNT } from "../row-count";
-import { circsCache } from "./calc-circs";
-import { distanceSegToP } from "./distance-seg-to-p";
-import { jumpIdx } from "./jump-idx";
+import type { Cell } from "../types/cell.js";
+import { ROW_COUNT } from "../row-count.js";
+import { circsCache } from "./calc-circs.js";
+import { distanceSegToP } from "./distance-seg-to-p.js";
+import { jumpIdx } from "./jump-idx.js";
 
 
 const { min, SQRT2 } = Math;

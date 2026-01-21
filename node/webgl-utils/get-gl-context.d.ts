@@ -1,4 +1,4 @@
-import type { GlContext } from "../types/gl-context";
+import type { GlContext } from "../types/gl-context.js";
 /**
  * Returns a `GlContext` by reference via a cache of `WebGL2RenderingContext`s.
  * * if `gl` doesn't exist in the cache yet a new context is created.
