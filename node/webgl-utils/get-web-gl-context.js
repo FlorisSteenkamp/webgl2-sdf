@@ -37,4 +37,4 @@ function deleteAllProps(o) {
     Object.keys(o).forEach(key => { delete o[key]; });
 }
 export { getWebGlContext };
-//# sourceMappingURL=get-gl-context.js.map
+//# sourceMappingURL=get-web-gl-context.js.map

@@ -6,5 +6,5 @@
  * @param resolution each bezier curve is split until its hausdorff distance
  * from the line connecting it's endpoints are less than this value
  */
-declare function bezierCurvesToLineSegs(bezierLoops: (number[][])[][], resolution: 0.5 | 1): number[][][];
+declare function bezierCurvesToLineSegs(bezierLoops: (number[][])[][]): number[][][];
 export { bezierCurvesToLineSegs };

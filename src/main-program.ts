@@ -17,11 +17,12 @@ const CROSS_TEX_INDEX = 2;
 function mainProgram(
         glContext: GlContext,
         programMain: Program,
-        resolution: 0.5|1,
         psss: number[][][][],
         viewbox: [number,number,number,number],
         maxDistance: number,
         sdfExponent = 1,
+        x: number,
+        y: number,
         width: number,
         height: number,
         colCount: number,
@@ -53,7 +54,7 @@ function mainProgram(
         segIdxs_PerStrip_Range_Arr
     } = prepareBuffers(
         psss, width, height, colCount, cellSize, maxDistance,
-        padCount, resolution, viewbox, stretch
+        padCount, viewbox, stretch
     );
 
     // Init/update attributes
@@ -77,6 +78,7 @@ function mainProgram(
     );
 
     // Init/update uniforms
+    setUniform_('2f', 'uOffset', x, y);
     setUniform_('2f', 'uWidthHeight', width, height);
     setUniform_('1f', 'uMaxDistance', maxDistance);
     setUniform_('1f', 'uExponent', sdfExponent);  // TODO

@@ -8,7 +8,7 @@ import { splitIntoLineSegments } from "./split-into-line-segments.js";
  * @param resolution each bezier curve is split until its hausdorff distance
  * from the line connecting it's endpoints are less than this value
  */
-function bezierCurvesToLineSegs(bezierLoops, resolution) {
+function bezierCurvesToLineSegs(bezierLoops) {
     let lineSegs = [];
     for (let i = 0; i < bezierLoops.length; i++) {
         const pss = bezierLoops[i];
@@ -21,7 +21,7 @@ function bezierCurvesToLineSegs(bezierLoops, resolution) {
                 lineSegs.push(ps);
                 continue;
             }
-            const lineSegs_ = splitIntoLineSegments(ps, resolution);
+            const lineSegs_ = splitIntoLineSegments(ps);
             lineSegs.push(...lineSegs_.filter(ps => !isReallyPoint(ps)));
         }
     }

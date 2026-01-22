@@ -8,7 +8,7 @@ import { ROW_COUNT } from './row-count.js';
 const SEG_TEX_INDEX = 0;
 const CELL_TEX_INDEX = 1;
 const CROSS_TEX_INDEX = 2;
-function mainProgram(glContext, programMain, resolution, psss, viewbox, maxDistance, sdfExponent = 1, width, height, colCount, cellSize, inclInside, inclOutside, padCount, stretch) {
+function mainProgram(glContext, programMain, psss, viewbox, maxDistance, sdfExponent = 1, x, y, width, height, colCount, cellSize, inclInside, inclOutside, padCount, stretch) {
     const { gl } = glContext;
     const vertices = [];
     const x0 = 0;
@@ -20,7 +20,7 @@ function mainProgram(glContext, programMain, resolution, psss, viewbox, maxDista
     const uvArr = new Float32Array(vertices);
     const setUniform_ = setUniform(programMain);
     const setAttribute_ = setAttribute(programMain);
-    const { lineSegPtCoords_Arr, segIdxs_PerCell_Range_Arr, closeCellIdxs_PerCell_Arr, closeCellIdxs_PerCell_Range_Arr, crossCellIdxs_PerCell_Arr, crossCellIdxs_perCell_Range_Arr, segIdxs_PerStrip_Range_Arr } = prepareBuffers(psss, width, height, colCount, cellSize, maxDistance, padCount, resolution, viewbox, stretch);
+    const { lineSegPtCoords_Arr, segIdxs_PerCell_Range_Arr, closeCellIdxs_PerCell_Arr, closeCellIdxs_PerCell_Range_Arr, crossCellIdxs_PerCell_Arr, crossCellIdxs_perCell_Range_Arr, segIdxs_PerStrip_Range_Arr } = prepareBuffers(psss, width, height, colCount, cellSize, maxDistance, padCount, viewbox, stretch);
     // Init/update attributes
     setAttribute_('aUV', 2, // size, i.e 2d - draw 2 values each time
     gl.FLOAT, gl.STATIC_DRAW, uvArr);
@@ -31,6 +31,7 @@ function mainProgram(glContext, programMain, resolution, psss, viewbox, maxDista
     gl.INT, gl.STATIC_DRAW, closeCellIdxs_PerCell_Range_Arr, 1 // instance division (once per instance)
     );
     // Init/update uniforms
+    setUniform_('2f', 'uOffset', x, y);
     setUniform_('2f', 'uWidthHeight', width, height);
     setUniform_('1f', 'uMaxDistance', maxDistance);
     setUniform_('1f', 'uExponent', sdfExponent); // TODO

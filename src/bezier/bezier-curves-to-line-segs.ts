@@ -11,8 +11,7 @@ import { splitIntoLineSegments } from "./split-into-line-segments.js";
  * from the line connecting it's endpoints are less than this value
  */
 function bezierCurvesToLineSegs(
-        bezierLoops: (number[][])[][],
-        resolution: 0.5|1) {
+        bezierLoops: (number[][])[][]) {
 
     let lineSegs: number[][][] = [];
     for (let i=0; i<bezierLoops.length; i++) {
@@ -26,7 +25,7 @@ function bezierCurvesToLineSegs(
                 continue;
             }
 
-            const lineSegs_ = splitIntoLineSegments(ps, resolution);
+            const lineSegs_ = splitIntoLineSegments(ps);
 
             lineSegs.push(...lineSegs_.filter(ps => !isReallyPoint(ps)));
         }

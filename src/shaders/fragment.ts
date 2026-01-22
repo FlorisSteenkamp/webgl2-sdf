@@ -1,12 +1,18 @@
 import { ROW_COUNT } from "../row-count.js";
-const cache = {};
-function getMainFragment(colCount, padCount) {
-    const fragment = cache[1024 * colCount + padCount];
-    if (fragment !== undefined) {
-        return fragment;
-    }
-    const main_Fragment = 
-    /*glsl*/ `#version 300 es
+
+
+const cache: { [padCount_times_colCount: number]: string } = {};
+
+
+function getFragment(
+        colCount: number,
+        padCount: number): string {
+
+    const fragment = cache[1024*colCount + padCount];
+    if (fragment !== undefined) { return fragment; }
+
+const main_Fragment = 
+/*glsl*/`#version 300 es
 
 precision highp float;
 
@@ -18,7 +24,7 @@ uniform highp isampler2D uCrossCellIdxs;
 uniform int uIncl;  // bit 0 -> incl inside, bit 1 -> incl outside
 
 uniform SegIdxRangePerCellBlock {
-    ivec4 uSegIdxRangePerCell[${(ROW_COUNT + 2 * padCount) * (colCount + 2 * padCount) / 2}];
+    ivec4 uSegIdxRangePerCell[${(ROW_COUNT + 2*padCount)*(colCount + 2*padCount) / 2}];
 };
 uniform SegIdxRangePerStripBlock {
     ivec4 uSegIdxRangePerStrip[${ROW_COUNT / 2}];
@@ -132,7 +138,8 @@ void main() {
     ///////////////////////////////////////////////////////////////////////////
 
     // DEBUG!
-    float alpha = ((instanceId + instanceId/${ROW_COUNT}) % 2 == 0 ? 0.3 : 0.5);
+    // float alpha = ((instanceId + instanceId/${ROW_COUNT}) % 2 == 0 ? 0.3 : 0.5);
+    float alpha = res == 1.0 ? 0.0 : 0.5;
 
     float red = inside ? 0.2 : 0.8;
     float green = abs(sin(50.0 * res));
@@ -141,9 +148,11 @@ void main() {
 
     FragColor = vec4(red, green, blue, alpha);
 }
-`;
-    cache[1024 * colCount + padCount] = main_Fragment;
+`
+
+    cache[1024*colCount + padCount] = main_Fragment;
     return main_Fragment;
 }
-export { getMainFragment };
-//# sourceMappingURL=main.fragment.js.map
+
+
+export { getFragment }

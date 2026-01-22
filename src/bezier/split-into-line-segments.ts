@@ -4,6 +4,9 @@ import { splitByDeviationFromStraighLine_Cubic_Crude } from './split-by-deviatio
 import { splitByDeviationFromStraighLine_Quad } from './split-by-deviation-from-straight-line-quad.js';
 
 
+const RESOLUTION = 0.5;
+
+
 /**
  * Returns the result of splitting the given bezier curve into straight line
  * segments up to `maxDeviation`
@@ -13,13 +16,12 @@ import { splitByDeviationFromStraighLine_Quad } from './split-by-deviation-from-
  * @param maxDeviation maximum deviation from straight line
  */
 function splitIntoLineSegments(
-        ps: number[][],
-        maxDeviation: number) {
+        ps: number[][]) {
     
     const ts = ps.length === 3
-        ? splitByDeviationFromStraighLine_Quad(ps, maxDeviation)
-        // : splitByDeviationFromStraighLine_Cubic_Precise(ps, maxDeviation)
-        : splitByDeviationFromStraighLine_Cubic_Crude(ps, maxDeviation)
+        ? splitByDeviationFromStraighLine_Quad(ps, RESOLUTION)
+        // : splitByDeviationFromStraighLine_Cubic_Precise(ps, RESOLUTION)
+        : splitByDeviationFromStraighLine_Cubic_Crude(ps, RESOLUTION)
 
     const segs: number[][][] = [];
     for (let i=0; i<ts.length - 1; i++) {

@@ -1,6 +1,6 @@
 // import { getWebGLContext } from './webgl-utils/get-gl-context.js';
-import { main_Vertex } from './shaders/main.vertex.js';
-import { getMainFragment } from './shaders/main.fragment.js';
+import { vertex } from './shaders/vertex.js';
+import { getFragment } from './shaders/fragment.js';
 import { initProgram } from './webgl-utils/use-program.js';
 import { mainProgram } from './main-program.js';
 import { ROW_COUNT } from './row-count.js';
@@ -13,24 +13,29 @@ const { ceil, min, max } = Math;
 
 
 /**
- * TODO
- * @param gl 
- * @param psss 
- * @param width 
- * @param height 
- * @param viewbox 
- * @param maxDistance 
- * @param sdfExponent 
- * @param inclInside 
- * @param inclOutside 
- * @param x 
- * @param y 
- * @param channel 
- * @param resolution 
+ * Generates an sdf (signed distance field) from the given bezier curves,
+ * viewbox, etc. and renders the result
+ * 
+ * @param glContext a `GlConext` previously created by `getWebGlContext(gl: WebGL2RenderingContext)`
+ * @param bezierCurves_or_svgStr either of
+ * * an array of linear (lines), quadratic or cubic bezier curves (or a mix
+ * thereof) given by given by their ordered control points,
+ * e.g. `[ [[0,0],[1,1],[2,1],[2,0]], [[2,0],[7,2],[1,5],[8,6]], ... ]` **OR**
+ * * an SVG string, e.g. "M26.53 478.83 C028.89 481.61 031.33 484.32 ..."
+ * @param width the width of the drawing rectangle
+ * @param height the height of the drawing rectangle
+ * @param viewbox the viewbox
+ * @param maxDistance maximum sdf distance
+ * @param sdfExponent TODO
+ * @param inclInside if `true` the sdf will be calculate for the inside of the shape
+ * @param inclOutside if `true` the sdf will be calculate for the outside of the shape
+ * @param x the position where to draw, x-coordinate
+ * @param y the position where to draw, y-coordinate
+ * @param channel TODO
  */
-function generateIntoFramebuffer(
+function generateSdf(
         glContext: GlContext,
-        psss: (number[][])[][] | string,
+        bezierCurves_or_svgStr: (number[][])[][] | string,
         width: number,
         height: number,
         viewbox: [number,number,number,number],
@@ -39,14 +44,13 @@ function generateIntoFramebuffer(
         inclInside = true,
         inclOutside = true,
         x = 0, y = 0,
-        channel = 0,
-        resolution: 0.5|1 = 0.5) {
+        channel = 0) {
 
     // debugShaders(gl);  // comment for production
 
-    const psss_ = typeof psss === 'string'
-        ? getPathsFromStr(psss)
-        : psss;
+    const psss = typeof bezierCurves_or_svgStr === 'string'
+        ? getPathsFromStr(bezierCurves_or_svgStr)
+        : bezierCurves_or_svgStr;
 
     // const glContext = getWebGLContext(gl);
 
@@ -69,15 +73,15 @@ function generateIntoFramebuffer(
 
     const programMain = initProgram(
         glContext, `main${colCount}-${padCount}`,
-        main_Vertex, getMainFragment(colCount, padCount)
+        vertex, getFragment(colCount, padCount)
     );
 
     const { gl } = glContext;
 
     gl.useProgram(programMain.program);
     mainProgram(
-        glContext, programMain, resolution, psss_,
-        viewbox, maxDistance, sdfExponent, width, height, colCount,
+        glContext, programMain, psss,
+        viewbox, maxDistance, sdfExponent, x, y, width, height, colCount,
         cellSize, inclInside, inclOutside, padCount, stretch
     );
 
@@ -90,4 +94,4 @@ function generateIntoFramebuffer(
 }
 
 
-export { generateIntoFramebuffer }
+export { generateSdf }

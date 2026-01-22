@@ -1,90 +1,101 @@
 WORK IN PROGRESS!!
+Bug reports, pull requests and ⭐⭐⭐⭐⭐s are welcome and appreciated!
 
 ## Overview
 
-A library to generate the signed distance transform (sdf) of an array of bezier
-curves, typically some some closed shape(s).
+An ultra-fast library to generate the signed distance field (sdf) of an array
+of bezier curves (lines, quadratics, cubics), typically some closed shape(s).
 
-* *dozens of times faster* than ()[webgl-sdf-generator] for real-time (60 fps)
-applications
+* *dozens of times faster* than [webgl-sdf-generator](https://github.com/lojjic/webgl-sdf-generator) for real-time (60+ fps)
+applications even on slow on-board GPUs
 
-* drop-in replacement for ()[webgl-sdf-generator] with some additional options
+* drop-in replacement for [webgl-sdf-generator](https://github.com/lojjic/webgl-sdf-generator) with a few additional options
 
-The bezier curves can be given in raw form or as an svg string (except arcs are
-not supported)
+The bezier curves can be given in raw form or as an SVG path string (except, arcs are
+not supported yet).
 
-```typescript
-
-```
-
-Bug reports, pull requests and ⭐⭐⭐⭐⭐s are welcome and appreciated!
-
-## Features
-
-* **Fast** Special care has been taken to ensure each function performs well not 
-only in theory but also in practice.
+Supported path commands:  `L, Q, C, H, V, S, T, Z  l, q, c, h, v, s, t, z`
 
 ## Installation
 
 ```cli
-npm install flo-bezier3
+npm install webgl2-sdf
 ```
+
+## How so fast?
+Two basic concepts were used:
+* *dynamically* split the bezier curves into line segments up to a specified
+accuracy - reduces the number of line segments to check
+* divide and pre-filter the number of curve segments within the cells of
+a 32x32 grid; then each shader only uses the relevant line segments for sdf
+calculation
+
+
+## Usage
+```typescript
+import { getWebGlContext, generateIntoFramebuffer } from "webgl2-sdf";
+
+const gl: WebGL2RenderingContext = canvas.getContext(
+    'webgl2',
+    {
+        depth: false, stencil: false, antialias: false,
+        premultipliedAlpha: false
+    }
+);
+
+const { width: canvasWidth, height: canvasHeight } = canvas.getBoundingClientRect();
+
+// The first call to `getWebGlContext` caches some context, e.g. compiled shader
+// programs, etc., subsequent calls simply uses the existing cache.
+const glContext = getWebGlContext(gl!);
+
+const someShape = 
+`
+    M 0 0
+    L 100 0
+    L 100 100
+    C 50 100 0 50 0 0
+    z
+`;
+
+try {
+    generateSdf(
+        glContext!,
+        someShape,
+        canvasWidth,   // width (of drawing area)
+        canvasHeight,  // height (of drawing area)
+        [-50, -50, 150, 150],  // viewBox
+        100,  // max sdf distance
+        1,  // TODO
+        true,  // include inside
+        true,  // include outside
+        0,  // canvas x coordinate
+        0,  // canvas y coordinate
+        0,  // channel  // TODO
+    );
+} catch (e) {
+    console.log(e);
+}
+
+// At the end, **only after you know you'll never call `generateIntoFramebuffer`
+// again on the same `WebGL2RenderingContext`**
+freeGlContext(glContext);  // dispose of textures, buffers, shaders, programs, etc.
+
+```
+
+## Recommendations
+When calling `generateIntoFramebuffer`
+* ensure the drawing `width` and `height` has the same aspect ratio as the viewbox
+else the image will be squashed / stretched
+* the `viewbox` is given as `[x1,y1,x2,y2]` and *not* as `[x,y,width,height]` as in SVG
+* note the `premultipliedAlpha` option when calling `getContext` and set it to your needs
+* if you want to combine a standard `CanvasRenderingContext2D` with a `WebGL2RenderingContext`
+it is best practice to have 2 canvases in your html that is stacked on top of each other
+
+## ESM only
 
 This package is [ESM only](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c).
 It can be used in `Node.js` or in a browser.
-
-Additionally, self-contained `ECMAScript Module` (ESM) files `index.js` and
-`index.min.js` in the `./browser` folder are provided.
-
-## Usage
-
-Below are usage examples for some common environments. 
-
-Please see the [docs](https://florissteenkamp.github.io/FloBezier) for a complete
-list of available functions.
-
-### Node.js
-```js
-import { fitQuadsToCubic } from 'flo-bezier3';
-
-```
-
-### Browsers - directly, without a bundler, using the pre-bundled minified .js file
-
-
-```html
-<!doctype html>
-
-<html lang="en">
-<head>
-    <script type="module">
-        import { fitQuadsToCubic } from "./node_modules/flo-bezier3/browser/index.min.js";
-
-        // some cubic bezier curve given by an array of its control points
-        const cubic = [[1, 1], [5.125, 8], [15.375, 0.875], [13.6875, 7.71875]];
-        const quads = fitQuadsToCubic(cubic, 0.1); //=> [[[1, 1], [2.617431640625, 3.5152587890625], ...
-
-        if (quads.length === 4) {
-            console.log('success! 😁');  // we should get to here!
-        } else {
-            console.log('failure! 😥');  // ...and not here
-        }
-    </script>
-</head>
-
-<body>Check the console.</body>
-
-</html>
-```
-
-### Bundlers (Webpack, Rollup, ...)
-
-Webpack will be taken as an example here.
-
-Since your webpack config file might still use `CommonJS` you must rename 
-`webpack.config.js` to `webpack.config.cjs`.
-
-Follow this [guide](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c#how-can-i-make-my-typescript-project-output-esm).
 
 
 ## License

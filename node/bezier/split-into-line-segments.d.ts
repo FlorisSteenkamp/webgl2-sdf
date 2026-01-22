@@ -6,5 +6,5 @@
  * @param ps
  * @param maxDeviation maximum deviation from straight line
  */
-declare function splitIntoLineSegments(ps: number[][], maxDeviation: number): number[][][];
+declare function splitIntoLineSegments(ps: number[][]): number[][][];
 export { splitIntoLineSegments };

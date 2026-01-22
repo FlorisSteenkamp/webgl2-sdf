@@ -15,16 +15,18 @@ function segBoxX(seg, square) {
     const dx = x1 - x0;
     const dy = y1 - y0;
     // Parametric line equation: P(t) = P1 + t*(P2-P1), where 0 <= t <= 1
-    const ts = [];
-    const ps = [];
+    // const ts: number[] = [];
+    // const ps: number[][] = [];
+    const xs = [];
     if (dx !== 0) {
         // Check intersection with left edge (x = minX)
         const tL = (minX - x0) / dx;
         if (tL >= 0 && tL <= 1) {
             const y = y0 + tL * dy;
             if (y >= minY && y <= maxY) {
-                ts.push(tL);
-                ps.push([minX, y]);
+                // ts.push(tL);
+                // ps.push([minX, y]);
+                xs.push({ t: tL, p: [minX, y] });
             }
         }
         // Check intersection with right edge (x = maxX)
@@ -32,8 +34,9 @@ function segBoxX(seg, square) {
         if (tR >= 0 && tR <= 1) {
             const y = y0 + tR * dy;
             if (y >= minY && y <= maxY) {
-                ts.push(tR);
-                ps.push([maxX, y]);
+                // ts.push(tR);
+                // ps.push([maxX, y]);
+                xs.push({ t: tR, p: [maxX, y] });
             }
         }
     }
@@ -43,8 +46,9 @@ function segBoxX(seg, square) {
         if (tT >= 0 && tT <= 1) {
             const x = x0 + tT * dx;
             if (x >= minX && x <= maxX) {
-                ts.push(tT);
-                ps.push([x, minY]);
+                // ts.push(tT);
+                // ps.push([x, minY]);
+                xs.push({ t: tT, p: [x, minY] });
             }
         }
         // Check intersection with top edge (y = maxY)
@@ -52,18 +56,24 @@ function segBoxX(seg, square) {
         if (tB >= 0 && tB <= 1) {
             const x = x0 + tB * dx;
             if (x >= minX && x <= maxX) {
-                ts.push(tB);
-                ps.push([x, maxY]);
+                // ts.push(tB);
+                // ps.push([x, maxY]);
+                xs.push({ t: tB, p: [x, maxY] });
             }
         }
     }
-    // TODO might be more than 2!!
-    if (ts.length === 2) {
-        return ts[0] < ts[1]
-            ? ps
-            : [ps[1], ps[0]];
-    }
-    return ps;
+    const seen = new Set(); // Store unique t values
+    const xs_ = xs.filter(x => {
+        const { t } = x;
+        if (seen.has(t)) {
+            return false;
+        }
+        else {
+            seen.add(t);
+            return true;
+        }
+    });
+    return xs_.sort((a, b) => a.t - b.t).map(x => x.p);
 }
 export { segBoxX };
 //# sourceMappingURL=seg-box-x.js.map

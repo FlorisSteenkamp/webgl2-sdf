@@ -18,14 +18,13 @@ function prepareBuffers(
         cellSize: number,
         maxDistance: number,
         padCount: number,
-        resolution: 0.5|1 = 0.5,
         viewbox: [number,number,number,number] = [0,0,width,height],
         stretch = 1) {
 
     ////////////////////////////////////////////////////////////////////////////
     const psss_ = mapToViewbox(viewbox, width, height/stretch, psss);
 
-    const lineSegs = bezierCurvesToLineSegs(psss_, resolution);
+    const lineSegs = bezierCurvesToLineSegs(psss_);
     const grid = createEmptyGrid(colCount, padCount);
     const strips = new Array(ROW_COUNT).fill(undefined).map(v => []);
 

@@ -8,10 +8,10 @@ import { ROW_COUNT } from './row-count.js';
 import { clipLineSegmentToStrips } from './utils/clip-line-segment-to-strips.js';
 import { mapToViewbox } from './utils/map-to-viewbox.js';
 // import { sum } from './utils/sum.js';  // testing
-function prepareBuffers(psss, width, height, colCount, cellSize, maxDistance, padCount, resolution = 0.5, viewbox = [0, 0, width, height], stretch = 1) {
+function prepareBuffers(psss, width, height, colCount, cellSize, maxDistance, padCount, viewbox = [0, 0, width, height], stretch = 1) {
     ////////////////////////////////////////////////////////////////////////////
     const psss_ = mapToViewbox(viewbox, width, height / stretch, psss);
-    const lineSegs = bezierCurvesToLineSegs(psss_, resolution);
+    const lineSegs = bezierCurvesToLineSegs(psss_);
     const grid = createEmptyGrid(colCount, padCount);
     const strips = new Array(ROW_COUNT).fill(undefined).map(v => []);
     for (let i = 0; i < lineSegs.length; i++) {
