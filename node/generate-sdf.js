@@ -30,12 +30,10 @@ const { ceil, min, max } = Math;
  * @param channel TODO
  */
 function generateSdf(glContext, bezierCurves_or_svgStr, width, height, viewbox, maxDistance, sdfExponent = 1, inclInside = true, inclOutside = true, x = 0, y = 0, channel = 0) {
-    // debugShaders(gl);  // comment for production
     const psss = typeof bezierCurves_or_svgStr === 'string'
         ? getPathsFromStr(bezierCurves_or_svgStr)
         : bezierCurves_or_svgStr;
     // const glContext = getWebGLContext(gl);
-    const { onContextLoss } = glContext;
     let stretch = 1;
     const aspectRatio = width / height;
     if (aspectRatio > MAX_ASPECT_RATIO_BEFORE_STRETCH) {
@@ -49,12 +47,15 @@ function generateSdf(glContext, bezierCurves_or_svgStr, width, height, viewbox, 
     const padCount = 2 * ceil(min(maxDistance, maxDim) / cellSize / 2);
     const programMain = initProgram(glContext, `main${colCount}-${padCount}`, vertex, getFragment(colCount, padCount));
     const { gl } = glContext;
+    // debugShaders(gl);  // comment for production
     gl.useProgram(programMain.program);
     mainProgram(glContext, programMain, psss, viewbox, maxDistance, sdfExponent, x, y, width, height, colCount, cellSize, inclInside, inclOutside, padCount, stretch);
-    // Handle context loss occurring during any of the above calls
-    if (gl.isContextLost()) {
-        onContextLoss();
-        throw new Error('Webgl2 context lost.');
+    // testing!!
+    if (Math.random() > 0.995) {
+        const loseContextExt = gl.getExtension('WEBGL_lose_context');
+        if (loseContextExt) {
+            loseContextExt.loseContext();
+        }
     }
 }
 export { generateSdf };

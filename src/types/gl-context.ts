@@ -20,7 +20,7 @@ interface GlContext {
     readonly gl: WebGL2RenderingContext;
     readonly textures: { [index:string]: Texture };
     readonly programs: { [index:string]: Program };
-    readonly onContextLoss: () => void;
+    onContextLoss?: (event: Event) => void;
 }
 
 

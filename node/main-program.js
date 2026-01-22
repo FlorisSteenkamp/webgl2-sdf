@@ -31,7 +31,6 @@ function mainProgram(glContext, programMain, psss, viewbox, maxDistance, sdfExpo
     gl.INT, gl.STATIC_DRAW, closeCellIdxs_PerCell_Range_Arr, 1 // instance division (once per instance)
     );
     // Init/update uniforms
-    setUniform_('2f', 'uOffset', x, y);
     setUniform_('2f', 'uWidthHeight', width, height);
     setUniform_('1f', 'uMaxDistance', maxDistance);
     setUniform_('1f', 'uExponent', sdfExponent); // TODO
@@ -87,9 +86,9 @@ function mainProgram(glContext, programMain, psss, viewbox, maxDistance, sdfExpo
     ///////////////////////////////////////////////
     if (stretch > 1) {
         gl.enable(gl.SCISSOR_TEST);
-        gl.scissor(0, 0, width, height / stretch);
+        gl.scissor(x, y, width, height / stretch);
     }
-    gl.viewport(0, 0, width, height);
+    gl.viewport(x, y, width, height);
     // draw a square colCount * ROW_COUNT times - 6 vertics
     gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, colCount * ROW_COUNT);
     if (stretch > 1) {

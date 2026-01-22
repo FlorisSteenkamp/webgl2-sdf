@@ -24,29 +24,19 @@ function getWebGlContext(
     const programs: { [index:string]: Program } = {};
     const textures: { [index:string]: Texture } = {};
 
-    gl.canvas.addEventListener('webglcontextlost', e => {
-        onContextLoss();
-        e.preventDefault();
-    }, false);
+    const glContext: GlContext = { gl, textures, programs };
 
-    const glContext: GlContext = {
-        gl,
-        onContextLoss,
-        textures,
-        programs
-    };
+    gl.canvas.addEventListener('webglcontextlost', event => {
+        deleteAllProps(programs);
+        deleteAllProps(textures);
+        cache.delete(gl);
+
+        glContext.onContextLoss?.(event);
+    }, false);
 
     cache.set(gl, glContext);
 
     return glContext;
-
-
-    ////////////////////////
-
-    function onContextLoss() {
-        deleteAllProps(programs);
-        deleteAllProps(textures);
-    }
 }
 
 

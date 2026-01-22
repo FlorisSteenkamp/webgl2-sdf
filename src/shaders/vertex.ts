@@ -5,7 +5,6 @@ const vertex = /*glsl*/`#version 300 es
 precision highp float;
 
 uniform vec2 uWidthHeight;
-uniform vec2 uOffset;
 in vec2 aUV;
 in ivec2 aCloseCellIdxRangePerCell;
 in ivec2 aCrossIdxRangePerCell;
@@ -41,14 +40,11 @@ void main() {
 
     float aspectRatio = width / height;
 
-    float x = (uOffset.x / 2.0*width) - 1.0;
-    float y = (uOffset.y / 2.0*height) - 1.0;
-
     gl_Position = vec4(
         vec2(
             (2.0*(uv.x / aspectRatio) - 1.0),
             (2.0*uv.y - 1.0)
-        ) + vec2(x,y),
+        ),
         0.0, 1.0
     );
 }

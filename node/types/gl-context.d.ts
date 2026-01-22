@@ -22,6 +22,6 @@ interface GlContext {
     readonly programs: {
         [index: string]: Program;
     };
-    readonly onContextLoss: () => void;
+    onContextLoss?: (event: Event) => void;
 }
 export type { GlContext };

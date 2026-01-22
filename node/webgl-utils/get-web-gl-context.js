@@ -15,23 +15,15 @@ function getWebGlContext(gl) {
     }
     const programs = {};
     const textures = {};
-    gl.canvas.addEventListener('webglcontextlost', e => {
-        onContextLoss();
-        e.preventDefault();
-    }, false);
-    const glContext = {
-        gl,
-        onContextLoss,
-        textures,
-        programs
-    };
-    cache.set(gl, glContext);
-    return glContext;
-    ////////////////////////
-    function onContextLoss() {
+    const glContext = { gl, textures, programs };
+    gl.canvas.addEventListener('webglcontextlost', event => {
         deleteAllProps(programs);
         deleteAllProps(textures);
-    }
+        cache.delete(gl);
+        glContext.onContextLoss?.(event);
+    }, false);
+    cache.set(gl, glContext);
+    return glContext;
 }
 function deleteAllProps(o) {
     Object.keys(o).forEach(key => { delete o[key]; });

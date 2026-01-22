@@ -1,5 +1,5 @@
-import { getMainFragment } from "./shaders/main.fragment.js";
-import { main_Vertex } from "./shaders/main.vertex.js";
+import { getFragment } from "./shaders/fragment.js";
+import { vertex } from "./shaders/vertex.js";
 
 
 /**
@@ -26,8 +26,8 @@ function debugShaders(
         gl: WebGL2RenderingContext) {
 
     try {
-        debugGlsl(gl, gl.VERTEX_SHADER, main_Vertex);
-        debugGlsl(gl, gl.FRAGMENT_SHADER, getMainFragment(32,4));
+        debugGlsl(gl, gl.VERTEX_SHADER, vertex);
+        debugGlsl(gl, gl.FRAGMENT_SHADER, getFragment(32,4));
     } catch (e) {
         console.log(e);
         throw e;
