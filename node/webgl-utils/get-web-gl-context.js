@@ -17,6 +17,7 @@ function getWebGlContext(gl) {
     const textures = {};
     const glContext = { gl, textures, programs };
     gl.canvas.addEventListener('webglcontextlost', event => {
+        // event.preventDefault();  // Prevent the default action (which is to not restore automatically)
         deleteAllProps(programs);
         deleteAllProps(textures);
         cache.delete(gl);

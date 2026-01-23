@@ -11,7 +11,6 @@ function getFragment(colCount, padCount) {
 precision highp float;
 
 uniform float uMaxDistance;
-uniform float uExponent;
 uniform highp sampler2D uSegs;
 uniform highp isampler2D uCloseCellIdxs;
 uniform highp isampler2D uCrossCellIdxs;
@@ -35,7 +34,7 @@ float absDistToSegment(vec2 point, vec2 lineA, vec2 lineB) {
     vec2 lineDir = lineB - lineA;
     float lenSq = dot(lineDir, lineDir);
     float t = clamp(dot(point - lineA, lineDir) / lenSq, 0.0, 1.0);
-    vec2 linePt = lineA + t * lineDir;
+    vec2 linePt = lineA + t*lineDir;
 
     return distance(point, linePt);
 }
@@ -54,15 +53,16 @@ void main() {
     for (int i = crossIdxS; i < crossIdxS + crossLen; i++) {
         int crossIdx = texelFetch(uCrossCellIdxs, ivec2(i%256, i/256), 0).x;
 
-        bool isEven = crossIdx % 2 == 0;
+        ivec2 uSegIdxRange = crossIdx % 2 == 0
+            ? uSegIdxRangePerCell[crossIdx / 2].xy
+            : uSegIdxRangePerCell[crossIdx / 2].zw;
 
-        ivec4 uSegIdxRange = uSegIdxRangePerCell[crossIdx / 2];
-        int segIdx = isEven ? uSegIdxRange.x : uSegIdxRange.z;
-        int segLen = isEven ? uSegIdxRange.y : uSegIdxRange.w;
+        int segIdx = uSegIdxRange.x;
+        int segLen = uSegIdxRange.y;
 
         for (int j = segIdx; j < segIdx + segLen; j++) {
             // Fetch segment from texture
-            vec4 seg = texelFetch(uSegs, ivec2(j, 0), 0);
+            vec4 seg = texelFetch(uSegs, ivec2(j%256, j/256), 0);
 
             // line segment's min-y is excluded
             bool crossing =
@@ -76,15 +76,18 @@ void main() {
     }
 
     {
-        bool isEven = (instanceId % ${ROW_COUNT}) % 2 == 0;
+        int cellIdx = (instanceId % ${ROW_COUNT});
 
-        ivec4 uSegIdxRange = uSegIdxRangePerStrip[(instanceId % ${ROW_COUNT}) / 2];
+        bool isEven = cellIdx % 2 == 0;
+
+        ivec4 uSegIdxRange = uSegIdxRangePerStrip[cellIdx / 2];
         int segIdx = isEven ? uSegIdxRange.x : uSegIdxRange.z;
         int segLen = isEven ? uSegIdxRange.y : uSegIdxRange.w;
+        
 
         for (int j = segIdx; j < segIdx + segLen; j++) {
             // Fetch segment from texture
-            vec4 seg = texelFetch(uSegs, ivec2(j, 0), 0);
+            vec4 seg = texelFetch(uSegs, ivec2(j%256, j/256), 0);
 
             // line segment's min-y is excluded
             bool crossing =
@@ -111,20 +114,22 @@ void main() {
         for (int i = cellIdxS; i < cellIdxS + cellLen; i++) {
             int cellIdx = texelFetch(uCloseCellIdxs, ivec2(i%256, i/256), 0).x;
 
-            bool isEven = cellIdx % 2 == 0;
-            ivec4 uSegIdxRange = uSegIdxRangePerCell[cellIdx / 2];
-            int segIdx = isEven ? uSegIdxRange.x : uSegIdxRange.z;
-            int segLen = isEven ? uSegIdxRange.y : uSegIdxRange.w;
+            ivec2 uSegIdxRange = cellIdx % 2 == 0
+                ? uSegIdxRangePerCell[cellIdx / 2].xy
+                : uSegIdxRangePerCell[cellIdx / 2].zw;
+
+            int segIdx = uSegIdxRange.x;
+            int segLen = uSegIdxRange.y;
 
             for (int j = segIdx; j < segIdx + segLen; j++) {
                 // Fetch segment from texture
-                vec4 seg = texelFetch(uSegs, ivec2(j, 0), 0);
+                vec4 seg = texelFetch(uSegs, ivec2(j%256, j/256), 0);
 
                 // Find unsigned distance to the segment; only the nearest will be kept
                 float d = absDistToSegment(vXY, seg.xy, seg.zw);
-                // Apply exponential transform TODO
-                // val = pow(1.0 - clamp(d / uMaxDistance, 0.0, 1.0), uExponent) * 0.5;
+                // Apply exponential transform
                 float val = clamp(d / uMaxDistance, 0.0, 1.0);
+
                 res = min(res, val);
             }
         }
@@ -133,12 +138,15 @@ void main() {
 
     // DEBUG!
     // float alpha = ((instanceId + instanceId/${ROW_COUNT}) % 2 == 0 ? 0.3 : 0.5);
-    float alpha = res == 1.0 ? 0.0 : 0.5;
 
+
+    float exponent = 2;
+    res = pow(1.0 - val, exponent) * 0.5;
+
+    float alpha = res == 1.0 ? 0.0 : 0.5;
     float red = inside ? 0.2 : 0.8;
-    float green = abs(sin(50.0 * res));
+    float green = abs(sin(25.0 * res));
     float blue = 0.5;
-    // float alpha = inside ? 0.5 : 0.0;
 
     FragColor = vec4(red, green, blue, alpha);
 }

@@ -26,7 +26,7 @@ function prepareBuffers(
 
     const lineSegs = bezierCurvesToLineSegs(psss_);
     const grid = createEmptyGrid(colCount, padCount);
-    const strips = new Array(ROW_COUNT).fill(undefined).map(v => []);
+    const strips = new Array(ROW_COUNT).fill(undefined).map(v => [] as number[][][]);
 
     for (let i=0; i<lineSegs.length; i++) {
         const seg = lineSegs[i];
@@ -39,16 +39,16 @@ function prepareBuffers(
     findCrossingCells(grid, colCount, padCount);  // add crossing cells
     ////////////////////////////////////////////////////////////////////////////
 
-    const allSegs: number[][][] = [];
-    const segIdxs_PerCell_Range: [number,number][] = [];
+    const allSegs: number[] = [];
+    const segIdxs_PerCell_Range: number[] = [];
 
     // close cells
     const closeCellIdxs_PerCell: number[] = [];
-    const closeCellIdxs_PerCell_Range: [number,number][] = [];
+    const closeCellIdxs_PerCell_Range: number[] = [];
 
     // crossing cells
     const crossCellIdxs_PerCell: number[] = [];
-    const crossCellIdxs_PerCell_Range: [number,number][] = [];
+    const crossCellIdxs_PerCell_Range: number[] = [];
 
     // const closeCellIdxsPerCell_: number[][] = [];  // testing
 
@@ -66,13 +66,15 @@ function prepareBuffers(
                 const { closeCells, crossingCells } = cell;
 
                 const L1 = crossingCells.length;
-                crossCellIdxs_PerCell.push(...crossingCells);
-                crossCellIdxs_PerCell_Range.push([S1, L1]);
-                S1 += L1;
-
                 const L2 = closeCells.length;
+
+                crossCellIdxs_PerCell.push(...crossingCells);
                 closeCellIdxs_PerCell.push(...closeCells);
-                closeCellIdxs_PerCell_Range.push([S2, L2]);
+
+                crossCellIdxs_PerCell_Range.push(S1, L1);
+                closeCellIdxs_PerCell_Range.push(S2, L2);
+
+                S1 += L1;
                 S2 += L2;
 
                 // closeCellIdxsPerCell_.push(closeCells);  // testing
@@ -82,15 +84,11 @@ function prepareBuffers(
             const { lineSegs } = cell;
 
             const L3 = lineSegs.length;
-            segIdxs_PerCell_Range.push([S3, L3]);
+            segIdxs_PerCell_Range.push(S3, L3);
             S3 += L3;
-            allSegs.push(...lineSegs);
+            allSegs.push(...lineSegs.flat(2));
         }
     }
-
-    // It is a requirement to fill in multiples of `TEX_WIDTH`
-    while (closeCellIdxs_PerCell.length % TEX_WIDTH !== 0) { closeCellIdxs_PerCell.push(0); }
-    while (crossCellIdxs_PerCell.length % TEX_WIDTH !== 0) { crossCellIdxs_PerCell.push(0); }
 
     // Add line segs from strips
     const segIdxs_PerStrip_Range: [number,number][] = [];
@@ -101,21 +99,26 @@ function prepareBuffers(
         const L = lineSegs.length;
         segIdxs_PerStrip_Range.push([S3, L]);
         S3 += L;
-        allSegs.push(...lineSegs);
+        allSegs.push(...lineSegs.flat(2));
     }
+
+    // It is a requirement to fill in multiples of `TEX_WIDTH`
+    while (closeCellIdxs_PerCell.length % TEX_WIDTH !== 0) { closeCellIdxs_PerCell.push(0); }
+    while (crossCellIdxs_PerCell.length % TEX_WIDTH !== 0) { crossCellIdxs_PerCell.push(0); }
+    while (allSegs.length % (4*TEX_WIDTH) !== 0) { allSegs.push(0); }
 
     
     // all line segments, with their ranges per cell and per strip
-    const lineSegPtCoords_Arr = new Float32Array(allSegs.flat(2));
-    const segIdxs_PerCell_Range_Arr = new Int32Array(segIdxs_PerCell_Range.flat());
+    const lineSegPtCoords_Arr = new Float32Array(allSegs);
+    const segIdxs_PerCell_Range_Arr = new Int32Array(segIdxs_PerCell_Range);
 
     // close cell idxs and range
-    const closeCellIdxs_PerCell_Range_Arr = new Int32Array(closeCellIdxs_PerCell_Range.flat());
+    const closeCellIdxs_PerCell_Range_Arr = new Int32Array(closeCellIdxs_PerCell_Range);
     const closeCellIdxs_PerCell_Arr = new Int32Array(closeCellIdxs_PerCell);
 
     // cross cell idxs and range
     const crossCellIdxs_PerCell_Arr = new Int32Array(crossCellIdxs_PerCell);
-    const crossCellIdxs_perCell_Range_Arr = new Int32Array(crossCellIdxs_PerCell_Range.flat());
+    const crossCellIdxs_perCell_Range_Arr = new Int32Array(crossCellIdxs_PerCell_Range);
 
     // segment index ranges per strip
     const segIdxs_PerStrip_Range_Arr = new Int32Array(segIdxs_PerStrip_Range.flat());

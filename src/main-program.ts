@@ -17,18 +17,20 @@ const CROSS_TEX_INDEX = 2;
 function mainProgram(
         glContext: GlContext,
         programMain: Program,
+
         psss: number[][][][],
         viewbox: [number,number,number,number],
         maxDistance: number,
-        sdfExponent = 1,
+        inclInside: boolean,
+        inclOutside: boolean,
+        customData: [number, number, number, number],
+
         x: number,
         y: number,
         width: number,
         height: number,
         colCount: number,
         cellSize: number,
-        inclInside: boolean,
-        inclOutside: boolean,
         padCount: number,
         stretch: number) {
 
@@ -80,8 +82,8 @@ function mainProgram(
     // Init/update uniforms
     setUniform_('2f', 'uWidthHeight', width, height);
     setUniform_('1f', 'uMaxDistance', maxDistance);
-    setUniform_('1f', 'uExponent', sdfExponent);  // TODO
     setUniform_('1i', 'uIncl', (inclInside ? 1 : 0) + (inclOutside ? 2 : 0));
+    setUniform_('4f', 'uCustom', ...customData);
 
     setUniformBlock(programMain)('SegIdxRangePerCellBlock', 0, segIdxs_PerCell_Range_Arr);
     setUniformBlock(programMain)('SegIdxRangePerStripBlock', 1, segIdxs_PerStrip_Range_Arr);
@@ -89,15 +91,19 @@ function mainProgram(
     ///////////////////////////////////////
     // Create buffer for line segment data
     useTexture(glContext, SEG_TEX_INDEX, 'segs');
-    gl.texImage2D(  // really 1d
+    gl.texImage2D(
         gl.TEXTURE_2D,
-        0,           // level - irrelevant
-        gl.RGBA32F,  // internalFormat - we're using 4 floats for the 2 line segment endpoints
-        lineSegPtCoords_Arr.length/4,  // width === number of lines
-        1,           // height - linear data texture so we only need height of 1
-        0,           // border - whatever
-        gl.RGBA,     // format
-        gl.FLOAT,    // it holds floats
+        0,            // level - irrelevant
+        gl.RGBA32F,   // internalFormat - we're using 4 floats for the 2 line segment endpoints
+
+        TEX_WIDTH,  // fixed width
+        lineSegPtCoords_Arr.length / 4 / TEX_WIDTH,  // height === number of point coordinates
+        // lineSegPtCoords_Arr.length/4,
+        // 1,
+
+        0,            // border - whatever
+        gl.RGBA,      // format
+        gl.FLOAT,     // it holds floats
         lineSegPtCoords_Arr  // texture data
     );
     const segTexLoc = gl.getUniformLocation(programMain.program, "uSegs");
@@ -107,12 +113,12 @@ function mainProgram(
     ///////////////////////////////////////////////
     // Create buffer for close cell indexes per cell
     useTexture(glContext, CELL_TEX_INDEX, 'closeCellIdxsPerCell');
-    gl.texImage2D(  // really 1d
+    gl.texImage2D(
         gl.TEXTURE_2D,
         0,           // level - irrelevant
         gl.R32I,     // internalFormat - we're using 1 signed 32-bit int for indexes
-        TEX_WIDTH,   // width === number of indexes
-        closeCellIdxs_PerCell_Arr.length / TEX_WIDTH,
+        TEX_WIDTH,   // fixed width
+        closeCellIdxs_PerCell_Arr.length / TEX_WIDTH,  // height === number of indexes
         0,           // border - whatever
         gl.RED_INTEGER,  // format
         gl.INT,    // it holds ints
@@ -126,12 +132,12 @@ function mainProgram(
     ///////////////////////////////////////////////
     // Create buffer for crossing cell indexes per cell
     useTexture(glContext, CROSS_TEX_INDEX, 'crossCellIdxsPerCell');
-    gl.texImage2D(  // really 1d
+    gl.texImage2D(
         gl.TEXTURE_2D,
         0,           // level - irrelevant
         gl.R32I,     // internalFormat - we're using 1 signed 32-bit int for indexes
-        TEX_WIDTH,   // width === number of indexes
-        crossCellIdxs_PerCell_Arr.length / TEX_WIDTH,  // height - linear data texture so we only need height of 1
+        TEX_WIDTH,   // fixed width
+        crossCellIdxs_PerCell_Arr.length / TEX_WIDTH,  // height === number of indexes
         0,           // border - whatever
         gl.RED_INTEGER,  // format
         gl.INT,    // it holds ints

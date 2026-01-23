@@ -6,7 +6,6 @@ import { mainProgram } from './main-program.js';
 import { ROW_COUNT } from './row-count.js';
 import { getPathsFromStr } from './svg/get-paths-from-str.js';
 import { MAX_ASPECT_RATIO_BEFORE_STRETCH } from './max-aspect-ratio-before-stretch.js';
-// import { debugShaders } from './debug-shaders.js';
 const { ceil, min, max } = Math;
 /**
  * Generates an sdf (signed distance field) from the given bezier curves,
@@ -29,7 +28,9 @@ const { ceil, min, max } = Math;
  * @param y the position where to draw, y-coordinate
  * @param channel TODO
  */
-function generateSdf(glContext, bezierCurves_or_svgStr, width, height, viewbox, maxDistance, sdfExponent = 1, inclInside = true, inclOutside = true, x = 0, y = 0, channel = 0) {
+function generateSdf(glContext, bezierCurves_or_svgStr, viewbox, width, height, x = 0, y = 0, maxDistance, inclInside = true, inclOutside = true, customData, 
+// TODO
+channel = 0) {
     const psss = typeof bezierCurves_or_svgStr === 'string'
         ? getPathsFromStr(bezierCurves_or_svgStr)
         : bezierCurves_or_svgStr;
@@ -49,14 +50,7 @@ function generateSdf(glContext, bezierCurves_or_svgStr, width, height, viewbox, 
     const { gl } = glContext;
     // debugShaders(gl);  // comment for production
     gl.useProgram(programMain.program);
-    mainProgram(glContext, programMain, psss, viewbox, maxDistance, sdfExponent, x, y, width, height, colCount, cellSize, inclInside, inclOutside, padCount, stretch);
-    // testing!!
-    if (Math.random() > 0.995) {
-        const loseContextExt = gl.getExtension('WEBGL_lose_context');
-        if (loseContextExt) {
-            loseContextExt.loseContext();
-        }
-    }
+    mainProgram(glContext, programMain, psss, viewbox, maxDistance, inclInside, inclOutside, customData, x, y, width, height, colCount, cellSize, padCount, stretch);
 }
 export { generateSdf };
 //# sourceMappingURL=generate-sdf.js.map

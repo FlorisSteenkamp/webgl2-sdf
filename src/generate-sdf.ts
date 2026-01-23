@@ -7,7 +7,7 @@ import { ROW_COUNT } from './row-count.js';
 import { getPathsFromStr } from './svg/get-paths-from-str.js';
 import { MAX_ASPECT_RATIO_BEFORE_STRETCH } from './max-aspect-ratio-before-stretch.js';
 import { GlContext } from './types/gl-context.js';
-// import { debugShaders } from './debug-shaders.js';
+import { debugShaders } from './debug-shaders.js';
 
 const { ceil, min, max } = Math;
 
@@ -36,14 +36,16 @@ const { ceil, min, max } = Math;
 function generateSdf(
         glContext: GlContext,
         bezierCurves_or_svgStr: (number[][])[][] | string,
+        viewbox: [number,number,number,number],
         width: number,
         height: number,
-        viewbox: [number,number,number,number],
+        x = 0, y = 0,
         maxDistance: number,
-        sdfExponent = 1,
         inclInside = true,
         inclOutside = true,
-        x = 0, y = 0,
+        customData: [number,number,number,number],
+        
+        // TODO
         channel = 0) {
 
     const psss = typeof bezierCurves_or_svgStr === 'string'
@@ -78,18 +80,11 @@ function generateSdf(
 
     gl.useProgram(programMain.program);
     mainProgram(
-        glContext, programMain, psss,
-        viewbox, maxDistance, sdfExponent, x, y, width, height, colCount,
-        cellSize, inclInside, inclOutside, padCount, stretch
+        glContext, programMain,
+        psss, viewbox, maxDistance, inclInside, inclOutside, customData,
+        x, y, width, height,
+        colCount, cellSize, padCount, stretch
     );
-
-    // testing!!
-    if (Math.random() > 0.995) {
-        const loseContextExt = gl.getExtension('WEBGL_lose_context');
-        if (loseContextExt) {
-            loseContextExt.loseContext();
-        }
-    }
 }
 
 

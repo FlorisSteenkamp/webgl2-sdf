@@ -8,7 +8,7 @@ import { ROW_COUNT } from './row-count.js';
 const SEG_TEX_INDEX = 0;
 const CELL_TEX_INDEX = 1;
 const CROSS_TEX_INDEX = 2;
-function mainProgram(glContext, programMain, psss, viewbox, maxDistance, sdfExponent = 1, x, y, width, height, colCount, cellSize, inclInside, inclOutside, padCount, stretch) {
+function mainProgram(glContext, programMain, psss, viewbox, maxDistance, inclInside, inclOutside, customData, x, y, width, height, colCount, cellSize, padCount, stretch) {
     const { gl } = glContext;
     const vertices = [];
     const x0 = 0;
@@ -33,18 +33,19 @@ function mainProgram(glContext, programMain, psss, viewbox, maxDistance, sdfExpo
     // Init/update uniforms
     setUniform_('2f', 'uWidthHeight', width, height);
     setUniform_('1f', 'uMaxDistance', maxDistance);
-    setUniform_('1f', 'uExponent', sdfExponent); // TODO
     setUniform_('1i', 'uIncl', (inclInside ? 1 : 0) + (inclOutside ? 2 : 0));
+    setUniform_('4f', 'uCustom', ...customData);
     setUniformBlock(programMain)('SegIdxRangePerCellBlock', 0, segIdxs_PerCell_Range_Arr);
     setUniformBlock(programMain)('SegIdxRangePerStripBlock', 1, segIdxs_PerStrip_Range_Arr);
     ///////////////////////////////////////
     // Create buffer for line segment data
     useTexture(glContext, SEG_TEX_INDEX, 'segs');
-    gl.texImage2D(// really 1d
-    gl.TEXTURE_2D, 0, // level - irrelevant
+    gl.texImage2D(gl.TEXTURE_2D, 0, // level - irrelevant
     gl.RGBA32F, // internalFormat - we're using 4 floats for the 2 line segment endpoints
-    lineSegPtCoords_Arr.length / 4, // width === number of lines
-    1, // height - linear data texture so we only need height of 1
+    TEX_WIDTH, // fixed width
+    lineSegPtCoords_Arr.length / 4 / TEX_WIDTH, // height === number of point coordinates
+    // lineSegPtCoords_Arr.length/4,
+    // 1,
     0, // border - whatever
     gl.RGBA, // format
     gl.FLOAT, // it holds floats
@@ -56,11 +57,11 @@ function mainProgram(glContext, programMain, psss, viewbox, maxDistance, sdfExpo
     ///////////////////////////////////////////////
     // Create buffer for close cell indexes per cell
     useTexture(glContext, CELL_TEX_INDEX, 'closeCellIdxsPerCell');
-    gl.texImage2D(// really 1d
-    gl.TEXTURE_2D, 0, // level - irrelevant
+    gl.texImage2D(gl.TEXTURE_2D, 0, // level - irrelevant
     gl.R32I, // internalFormat - we're using 1 signed 32-bit int for indexes
-    TEX_WIDTH, // width === number of indexes
-    closeCellIdxs_PerCell_Arr.length / TEX_WIDTH, 0, // border - whatever
+    TEX_WIDTH, // fixed width
+    closeCellIdxs_PerCell_Arr.length / TEX_WIDTH, // height === number of indexes
+    0, // border - whatever
     gl.RED_INTEGER, // format
     gl.INT, // it holds ints
     closeCellIdxs_PerCell_Arr // texture data
@@ -71,11 +72,10 @@ function mainProgram(glContext, programMain, psss, viewbox, maxDistance, sdfExpo
     ///////////////////////////////////////////////
     // Create buffer for crossing cell indexes per cell
     useTexture(glContext, CROSS_TEX_INDEX, 'crossCellIdxsPerCell');
-    gl.texImage2D(// really 1d
-    gl.TEXTURE_2D, 0, // level - irrelevant
+    gl.texImage2D(gl.TEXTURE_2D, 0, // level - irrelevant
     gl.R32I, // internalFormat - we're using 1 signed 32-bit int for indexes
-    TEX_WIDTH, // width === number of indexes
-    crossCellIdxs_PerCell_Arr.length / TEX_WIDTH, // height - linear data texture so we only need height of 1
+    TEX_WIDTH, // fixed width
+    crossCellIdxs_PerCell_Arr.length / TEX_WIDTH, // height === number of indexes
     0, // border - whatever
     gl.RED_INTEGER, // format
     gl.INT, // it holds ints

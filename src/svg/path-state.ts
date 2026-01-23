@@ -1,5 +1,4 @@
 
-/** @hidden */
 interface PathState {
     initialPoint?: number[] | undefined;
     p: number[];

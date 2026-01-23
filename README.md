@@ -9,8 +9,6 @@ of bezier curves (lines, quadratics, cubics), typically some closed shape(s).
 * *dozens of times faster* than [webgl-sdf-generator](https://github.com/lojjic/webgl-sdf-generator) for real-time (60+ fps)
 applications even on slow on-board GPUs
 
-* drop-in replacement for [webgl-sdf-generator](https://github.com/lojjic/webgl-sdf-generator) with a few additional options
-
 The bezier curves can be given in raw form or as an SVG path string (except, arcs are
 not supported yet).
 
@@ -23,7 +21,7 @@ npm install webgl2-sdf
 ```
 
 ## How so fast?
-Two basic concepts were used:
+Two basic concepts are used:
 * *dynamically* split the bezier curves into line segments up to a specified
 accuracy - reduces the number of line segments to check
 * divide and pre-filter the number of curve segments within the cells of
@@ -33,58 +31,71 @@ calculation
 
 ## Usage
 ```typescript
-import { getWebGlContext, generateIntoFramebuffer } from "webgl2-sdf";
+import { getWebGlContext, generateSdf } from "webgl2-sdf";
 
-const gl: WebGL2RenderingContext = canvas.getContext(
-    'webgl2',
-    {
-        depth: false, stencil: false, antialias: false,
-        premultipliedAlpha: false
-    }
-);
 
-const { width: canvasWidth, height: canvasHeight } = canvas.getBoundingClientRect();
-
-// The first call to `getWebGlContext` caches some context, e.g. compiled shader
-// programs, etc., subsequent calls simply uses the existing cache.
-const glContext = getWebGlContext(gl!);
-
-const someShape = 
-`
-    M 0 0
-    L 100 0
-    L 100 100
-    C 50 100 0 50 0 0
-    z
-`;
-
-try {
-    generateSdf(
-        glContext!,
-        someShape,
-        canvasWidth,   // width (of drawing area)
-        canvasHeight,  // height (of drawing area)
-        [-50, -50, 150, 150],  // viewBox
-        100,  // max sdf distance
-        1,  // TODO
-        true,  // include inside
-        true,  // include outside
-        0,  // canvas x coordinate
-        0,  // canvas y coordinate
-        0,  // channel  // TODO
+function drawSdf() {
+    const gl: WebGL2RenderingContext = canvas.getContext(
+        'webgl2',
+        {
+            depth: false, stencil: false, antialias: false,
+            premultipliedAlpha: false
+        }
     );
-} catch (e) {
-    console.log(e);
+
+    const { width: canvasWidth, height: canvasHeight } = canvas.getBoundingClientRect();
+
+    // The first call to `getWebGlContext` caches some context, e.g. compiled shader
+    // programs, etc., subsequent calls simply uses the existing cache.
+    const glContext = getWebGlContext(gl!);
+
+    // Optional...
+    glContext.onContextLoss = onContextLoss;
+
+    const someShape = 
+    `
+        M 0 0
+        L 100 0
+        L 100 100
+        C 50 100 0 50 0 0
+        z
+    `;
+
+    try {
+        generateSdf(
+            glContext!,
+            someShape,
+            canvasWidth,   // width (of drawing area)
+            canvasHeight,  // height (of drawing area)
+            [-50, -50, 150, 150],  // viewBox
+            100,  // max sdf distance
+            1,  // TODO
+            true,  // include inside
+            true,  // include outside
+            0,  // canvas x coordinate
+            0,  // canvas y coordinate
+            0,  // channel  // TODO
+        );
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+
+function onContextLoss(event: Event) {
+    // ... do somethin when context is lost, most likely by re-establishing a new context
+    console.log(event);
 }
 
 // At the end, **only after you know you'll never call `generateIntoFramebuffer`
 // again on the same `WebGL2RenderingContext`**
-freeGlContext(glContext);  // dispose of textures, buffers, shaders, programs, etc.
+// freeGlContext(glContext);  // dispose of textures, buffers, shaders, programs, etc.
 
 ```
 
 ## Recommendations
-When calling `generateIntoFramebuffer`
+When calling `generateIntoFramebuffer`:
+
 * ensure the drawing `width` and `height` has the same aspect ratio as the viewbox
 else the image will be squashed / stretched
 * the `viewbox` is given as `[x1,y1,x2,y2]` and *not* as `[x,y,width,height]` as in SVG

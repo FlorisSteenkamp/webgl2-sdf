@@ -20,5 +20,5 @@ import { GlContext } from './types/gl-context.js';
  * @param y the position where to draw, y-coordinate
  * @param channel TODO
  */
-declare function generateSdf(glContext: GlContext, bezierCurves_or_svgStr: (number[][])[][] | string, width: number, height: number, viewbox: [number, number, number, number], maxDistance: number, sdfExponent?: number, inclInside?: boolean, inclOutside?: boolean, x?: number, y?: number, channel?: number): void;
+declare function generateSdf(glContext: GlContext, bezierCurves_or_svgStr: (number[][])[][] | string, viewbox: [number, number, number, number], width: number, height: number, x: number | undefined, y: number | undefined, maxDistance: number, inclInside: boolean | undefined, inclOutside: boolean | undefined, customData: [number, number, number, number], channel?: number): void;
 export { generateSdf };
