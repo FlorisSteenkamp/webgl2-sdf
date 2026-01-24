@@ -1,6 +1,7 @@
 import type { Texture } from "../types/texture.js";
 import type { Program } from "../types/program.js";
 import type { GlContext } from "../types/gl-context.js";
+import { debugShaders } from "../debug-shaders.js";
 
 
 const cache = new WeakMap<WebGL2RenderingContext, GlContext>();
@@ -20,6 +21,8 @@ function getWebGlContext(
         const glContext = cache.get(gl);
         if (glContext) { return glContext; }
     }
+
+    debugShaders(gl);
 
     const programs: { [index:string]: Program } = {};
     const textures: { [index:string]: Texture } = {};

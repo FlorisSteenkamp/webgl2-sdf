@@ -1,4 +1,14 @@
 import { GlContext } from './types/gl-context.js';
+interface SdfOptions {
+    /** the position where to draw, x-coordinate */
+    readonly x?: number | undefined;
+    readonly y?: number | undefined;
+    readonly testInteriorExterior?: boolean | undefined;
+    readonly calcSdfForInside?: boolean | undefined;
+    readonly calcSdfForOutside?: boolean | undefined;
+    readonly customData?: [number, number, number, number] | undefined;
+    readonly glslRgbaCalcStr?: string | undefined;
+}
 /**
  * Generates an sdf (signed distance field) from the given bezier curves,
  * viewbox, etc. and renders the result
@@ -9,16 +19,77 @@ import { GlContext } from './types/gl-context.js';
  * thereof) given by given by their ordered control points,
  * e.g. `[ [[0,0],[1,1],[2,1],[2,0]], [[2,0],[7,2],[1,5],[8,6]], ... ]` **OR**
  * * an SVG string, e.g. "M26.53 478.83 C028.89 481.61 031.33 484.32 ..."
+ * @param viewbox the viewbox given as `[x1,x2,y1,y2]` (**not as** `[x,y,widht,height]`)
  * @param width the width of the drawing rectangle
  * @param height the height of the drawing rectangle
- * @param viewbox the viewbox
  * @param maxDistance maximum sdf distance
- * @param sdfExponent TODO
- * @param inclInside if `true` the sdf will be calculate for the inside of the shape
- * @param inclOutside if `true` the sdf will be calculate for the outside of the shape
- * @param x the position where to draw, x-coordinate
- * @param y the position where to draw, y-coordinate
- * @param channel TODO
+ * @param options additional options (see below)
+ *
+ * **The following are properties of the `options` parameters**
+ * @param x defaults to `0`; the position where to draw on the canvas, x-coordinate
+ * @param y defaults to `0`; the position where to draw on the canvas, y-coordinate
+ * @param testInteriorExterior defaults to `true`;
+ * if `false` winds will always be `0.0` and only an un-signed sdf can be calculated since all
+ * fragments are considered outside
+ * @param calcSdfForInside defaults to `true`;
+ * if `false` the sdf will not be calculate for the inside of the shape, in the shader, `res` will always be `1.0`
+ * @param calcSdfForOutside defaults to `true`;
+ * if `false` the sdf will not be calculate for the outside of the shape, in the shader, `res` will always be `1.0`
+ * @param customData optional custom data (must be an array of 4 numbers) to send to
+ * the fragment shader as a uniform, e.g. exponent, scale, a timer, or whatever
+ * @param glslRgbaCalcStr  a glsl string (#version 300 es) inserted at the end of
+ * the fragment shader to modify the output frag color in any way (you can also discard the fragment);
+ * see below for available variables that can be used;
+ *
+ * defaults to (designed to match webgl-sdf-generator)
+ * ```glsl
+ * float exponent = uCustom.x;
+ * res = (pow(1.0 - res, exponent) * 0.5) * (inside ? -1.0 : 1.0);
+ * float red = res;
+ * float green = res;
+ * float blue = res;
+ * float alpha = res;
+ *
+ * ```
+ * You must define and assign \`red\`, \`green\`, \`blue\` and \`alpha\`.
+ *
+ * Usable variables:
+ * ```glsl
+ * // the result of the distance calculation for this fragment, a value from 0.0 to 1.0
+ * // with 1.0 occuring when the fragment is >= maxDistance away and 0.0 when the
+ * // fragment is exactly on a curve
+ * float res
+ *
+ * // the number of anti-clockwise winds around the fragment, a value != 0
+ * // means the fragment is inside the shape
+ * float winds
+ *
+ * // 4 custom values set via an options parameter of `generateSdf`; defaults to `[1,0,0,0]`;
+ * // the first value is used as the exponent within the default `glslRgbaCalcStr`
+ * vec4 uCustom;
+ *
+ * // the max distance value supplied via `generateSdf`
+ * float uMaxDistance
+ *
+ * // bit 0 -> calc sdf when fragment is inside; defaults to 1,
+ * // bit 1 -> calc sdf when fragment is outside; defaults to 1
+ * // bit 1 -> calc `winds` (required for signing the distance); defaults to 1
+ * // note: when the distance calculation is not done (via options from `generateSdf`),
+ * `res` will be set to 1.0 (max distance away)
+ * int uTestInOut
+ *
+ * // the original x,y coordinates of the fragment in the original space provided
+ * // via the `viewbox` in `generateSdf`, e.g. the very bottom-left fragment
+ * // will have vXY == (viebox[0], viebox[1]) and the very top right will have
+ * // coordinates vXY == (viebox[2], viebox[3])
+ * vec2 vXY
+ *
+ * // whether the point is inside or outside the shape, often used to sign `res`
+ * // it is identical to `winds != 0`
+ * bool inside
+ *
+ * // pretty much useless unless you want to create a checkerboard pattern for no good reason
+ * int instanceId
  */
-declare function generateSdf(glContext: GlContext, bezierCurves_or_svgStr: (number[][])[][] | string, viewbox: [number, number, number, number], width: number, height: number, x: number | undefined, y: number | undefined, maxDistance: number, inclInside: boolean | undefined, inclOutside: boolean | undefined, customData: [number, number, number, number], channel?: number): void;
-export { generateSdf };
+declare function generateSdf(glContext: GlContext, bezierCurves_or_svgStr: (number[][])[][] | string, viewbox: [number, number, number, number], width: number, height: number, maxDistance: number, options?: SdfOptions): void;
+export { generateSdf, SdfOptions };

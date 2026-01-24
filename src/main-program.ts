@@ -7,6 +7,7 @@ import { GlContext } from './types/gl-context.js';
 import { prepareBuffers } from './prepare-buffers.js';
 import { TEX_WIDTH } from './tex-width.js';
 import { ROW_COUNT } from './row-count.js';
+import { SdfOptions } from './generate-sdf.js';
 
 
 const SEG_TEX_INDEX = 0;
@@ -21,20 +22,24 @@ function mainProgram(
         psss: number[][][][],
         viewbox: [number,number,number,number],
         maxDistance: number,
-        inclInside: boolean,
-        inclOutside: boolean,
-        customData: [number, number, number, number],
-
-        x: number,
-        y: number,
         width: number,
         height: number,
+
+        options: SdfOptions,
+
         colCount: number,
         cellSize: number,
         padCount: number,
         stretch: number) {
 
     const { gl } = glContext;
+
+    const {
+        x = 0, y = 0, testInteriorExterior = true,
+        calcSdfForInside = true, calcSdfForOutside = true,
+        customData = [1,0,0,0],
+        glslRgbaCalcStr
+    } = options;
 
     const vertices: number[] = [];
     const x0 = 0;
@@ -82,7 +87,11 @@ function mainProgram(
     // Init/update uniforms
     setUniform_('2f', 'uWidthHeight', width, height);
     setUniform_('1f', 'uMaxDistance', maxDistance);
-    setUniform_('1i', 'uIncl', (inclInside ? 1 : 0) + (inclOutside ? 2 : 0));
+    setUniform_('1i', 'uTestInOut',
+        (calcSdfForInside ? 1 : 0) +
+        (calcSdfForOutside ? 2 : 0) +
+        (testInteriorExterior ? 4 : 0)
+    );
     setUniform_('4f', 'uCustom', ...customData);
 
     setUniformBlock(programMain)('SegIdxRangePerCellBlock', 0, segIdxs_PerCell_Range_Arr);
@@ -153,6 +162,8 @@ function mainProgram(
     }
 
     gl.viewport(x, y, width, height);
+
+    gl.colorMask(true, true, true, true);
 
     // draw a square colCount * ROW_COUNT times - 6 vertics
     gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, colCount*ROW_COUNT);

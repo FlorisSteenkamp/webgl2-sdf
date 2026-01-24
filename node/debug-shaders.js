@@ -1,4 +1,4 @@
-import { getFragment } from "./shaders/fragment.js";
+import { getFragment, GLSL_DEFAULT } from "./shaders/fragment.js";
 import { vertex } from "./shaders/vertex.js";
 /**
  *
@@ -17,7 +17,7 @@ function debugGlsl(gl, type, shaderStr) {
 function debugShaders(gl) {
     try {
         debugGlsl(gl, gl.VERTEX_SHADER, vertex);
-        debugGlsl(gl, gl.FRAGMENT_SHADER, getFragment(32, 4));
+        debugGlsl(gl, gl.FRAGMENT_SHADER, getFragment(32, 2, GLSL_DEFAULT, 0));
     }
     catch (e) {
         console.log(e);

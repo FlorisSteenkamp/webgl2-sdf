@@ -8,8 +8,9 @@ import { ROW_COUNT } from './row-count.js';
 const SEG_TEX_INDEX = 0;
 const CELL_TEX_INDEX = 1;
 const CROSS_TEX_INDEX = 2;
-function mainProgram(glContext, programMain, psss, viewbox, maxDistance, inclInside, inclOutside, customData, x, y, width, height, colCount, cellSize, padCount, stretch) {
+function mainProgram(glContext, programMain, psss, viewbox, maxDistance, width, height, options, colCount, cellSize, padCount, stretch) {
     const { gl } = glContext;
+    const { x = 0, y = 0, testInteriorExterior = true, calcSdfForInside = true, calcSdfForOutside = true, customData = [1, 0, 0, 0], glslRgbaCalcStr } = options;
     const vertices = [];
     const x0 = 0;
     const y0 = 0;
@@ -33,7 +34,9 @@ function mainProgram(glContext, programMain, psss, viewbox, maxDistance, inclIns
     // Init/update uniforms
     setUniform_('2f', 'uWidthHeight', width, height);
     setUniform_('1f', 'uMaxDistance', maxDistance);
-    setUniform_('1i', 'uIncl', (inclInside ? 1 : 0) + (inclOutside ? 2 : 0));
+    setUniform_('1i', 'uTestInOut', (calcSdfForInside ? 1 : 0) +
+        (calcSdfForOutside ? 2 : 0) +
+        (testInteriorExterior ? 4 : 0));
     setUniform_('4f', 'uCustom', ...customData);
     setUniformBlock(programMain)('SegIdxRangePerCellBlock', 0, segIdxs_PerCell_Range_Arr);
     setUniformBlock(programMain)('SegIdxRangePerStripBlock', 1, segIdxs_PerStrip_Range_Arr);
@@ -89,6 +92,7 @@ function mainProgram(glContext, programMain, psss, viewbox, maxDistance, inclIns
         gl.scissor(x, y, width, height / stretch);
     }
     gl.viewport(x, y, width, height);
+    gl.colorMask(true, true, true, true);
     // draw a square colCount * ROW_COUNT times - 6 vertics
     gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, colCount * ROW_COUNT);
     if (stretch > 1) {

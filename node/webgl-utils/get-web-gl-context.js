@@ -1,3 +1,4 @@
+import { debugShaders } from "../debug-shaders.js";
 const cache = new WeakMap();
 /**
  * Returns a `GlContext` by reference via a cache of `WebGL2RenderingContext`s.
@@ -13,6 +14,7 @@ function getWebGlContext(gl) {
             return glContext;
         }
     }
+    debugShaders(gl);
     const programs = {};
     const textures = {};
     const glContext = { gl, textures, programs };
