@@ -12,7 +12,7 @@ applications even on slow on-board GPUs
 The bezier curves can be given in raw form or as an SVG path string (except, arcs are
 not supported yet).
 
-Supported path commands:  `L, Q, C, H, V, S, T, Z  l, q, c, h, v, s, t, z`
+Supported path commands: `L, Q, C, H, V, S, T, Z  l, q, c, h, v, s, t, z`
 
 ## Installation
 
@@ -31,7 +31,7 @@ calculation
 
 ## Usage
 ```typescript
-import { getWebGlContext, generateSdf } from "webgl2-sdf";
+import { getWebGlContext, generateSdf, GLSL_PATTERN1 } from "webgl2-sdf";
 
 
 function drawSdf() {
@@ -39,7 +39,7 @@ function drawSdf() {
         'webgl2',
         {
             depth: false, stencil: false, antialias: false,
-            premultipliedAlpha: false
+            premultipliedAlpha: false, preserveDrawingBuffer: true
         }
     );
 
@@ -65,16 +65,24 @@ function drawSdf() {
         generateSdf(
             glContext!,
             someShape,
+            [-50, -50, 150, 150],  // viewBox
             canvasWidth,   // width (of drawing area)
             canvasHeight,  // height (of drawing area)
-            [-50, -50, 150, 150],  // viewBox
-            100,  // max sdf distance
-            1,  // TODO
-            true,  // include inside
-            true,  // include outside
-            0,  // canvas x coordinate
-            0,  // canvas y coordinate
-            0,  // channel  // TODO
+            50,  // max sdf distance
+
+            // The below options are optional (see function signature for details)
+            {
+                x: 0, y: 0,  // canvas x, y coordinates; [0,0] is bottom left!
+                testInteriorExterior: true,
+                calcSdfForInside: true,
+                calcSdfForOutside: true,
+                customData: [
+                    2.0,    // exponent when using default `glslRgbaCalcStr`
+                    0, 0, 0
+                ],
+                colorMask: [true, true, true, true],
+                // glslRgbaCalcStr: GLSL_PATTERN1
+            }
         );
     } catch (e) {
         console.log(e);

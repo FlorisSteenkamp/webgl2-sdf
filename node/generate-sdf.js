@@ -11,7 +11,8 @@ const defaultSdfOptions = {
     x: 0, y: 0,
     testInteriorExterior: true,
     calcSdfForInside: true, calcSdfForOutside: true,
-    customData: [1, 0, 0, 0]
+    customData: [1, 0, 0, 0],
+    colorMask: [true, true, true, true]
 };
 /**
  * Generates an sdf (signed distance field) from the given bezier curves,
@@ -27,11 +28,14 @@ const defaultSdfOptions = {
  * @param width the width of the drawing rectangle
  * @param height the height of the drawing rectangle
  * @param maxDistance maximum sdf distance
- * @param options additional options (see below)
+ * @param options optional additional options (see below)
  *
  * **The following are properties of the `options` parameters**
+ *
  * @param x defaults to `0`; the position where to draw on the canvas, x-coordinate
  * @param y defaults to `0`; the position where to draw on the canvas, y-coordinate
+ * @param colorMask defaults to `[true,true,true,true]`; an array of length 4 for the rgba color mask values;
+ * will be called as `gl.setColorMask(...colorMask)` to allow/prevent selected color channels from updating
  * @param testInteriorExterior defaults to `true`;
  * if `false` winds will always be `0.0` and only an un-signed sdf can be calculated since all
  * fragments are considered outside
@@ -48,11 +52,12 @@ const defaultSdfOptions = {
  * defaults to (designed to match webgl-sdf-generator)
  * ```glsl
  * float exponent = uCustom.x;
- * res = (pow(1.0 - res, exponent) * 0.5) * (inside ? -1.0 : 1.0);
+ * float adj = 0.5*pow(1.0 - res, exponent);
+ * res = inside ? 1.0 - adj : adj;
  * float red = res;
  * float green = res;
  * float blue = res;
- * float alpha = res;
+ * float alpha = 0.5;
  *
  * ```
  * You must define and assign \`red\`, \`green\`, \`blue\` and \`alpha\`.

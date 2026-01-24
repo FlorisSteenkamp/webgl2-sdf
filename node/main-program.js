@@ -10,7 +10,7 @@ const CELL_TEX_INDEX = 1;
 const CROSS_TEX_INDEX = 2;
 function mainProgram(glContext, programMain, psss, viewbox, maxDistance, width, height, options, colCount, cellSize, padCount, stretch) {
     const { gl } = glContext;
-    const { x = 0, y = 0, testInteriorExterior = true, calcSdfForInside = true, calcSdfForOutside = true, customData = [1, 0, 0, 0], glslRgbaCalcStr } = options;
+    const { x = 0, y = 0, testInteriorExterior = true, calcSdfForInside = true, calcSdfForOutside = true, customData = [1, 0, 0, 0], colorMask = [true, true, true, true] } = options;
     const vertices = [];
     const x0 = 0;
     const y0 = 0;
@@ -92,7 +92,7 @@ function mainProgram(glContext, programMain, psss, viewbox, maxDistance, width, 
         gl.scissor(x, y, width, height / stretch);
     }
     gl.viewport(x, y, width, height);
-    gl.colorMask(true, true, true, true);
+    gl.colorMask(...colorMask);
     // draw a square colCount * ROW_COUNT times - 6 vertics
     gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, colCount * ROW_COUNT);
     if (stretch > 1) {

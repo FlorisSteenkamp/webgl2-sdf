@@ -38,7 +38,7 @@ function mainProgram(
         x = 0, y = 0, testInteriorExterior = true,
         calcSdfForInside = true, calcSdfForOutside = true,
         customData = [1,0,0,0],
-        glslRgbaCalcStr
+        colorMask = [true,true,true,true]
     } = options;
 
     const vertices: number[] = [];
@@ -163,7 +163,7 @@ function mainProgram(
 
     gl.viewport(x, y, width, height);
 
-    gl.colorMask(true, true, true, true);
+    gl.colorMask(...colorMask);
 
     // draw a square colCount * ROW_COUNT times - 6 vertics
     gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, colCount*ROW_COUNT);

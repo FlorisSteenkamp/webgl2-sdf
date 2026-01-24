@@ -6,17 +6,19 @@ const cache: { [padCount_times_colCount: number]: string } = {};
 
 const GLSL_PATTERN1 = `
     float exponent = uCustom.x;
+    float alpha = res >= 1.0 ? 0.0 : 0.5;
     res = pow(1.0 - res, exponent);
-    float alpha = res <= 0.0 ? 0.0 : 0.5;
     float red = inside ? 0.2 : 0.8;
     float green = abs(sin(25.0 * res));
+    // float green = step(0.5, fract(10.0 * res));
     float blue = 0.5;
 `;
 
 
 const GLSL_DEFAULT = `
     float exponent = uCustom.x;
-    res = (pow(1.0 - res, exponent) * 0.5) * (inside ? -1.0 : 1.0);
+    float adj = 0.5*pow(1.0 - res, exponent);
+    res = inside ? 1.0 - adj : adj;
     float red = res;
     float green = res;
     float blue = res;
@@ -89,7 +91,7 @@ void main() {
     ///////////////////////////////////////////////////////////////////////////
 
     float winds = 0.0;
-    if ((uTestInOut & 4) == 0) {
+    if ((uTestInOut & 4) != 0) {
         int crossIdxS = crossCellIdxRange.x;
         int crossLen = crossCellIdxRange.y;
         // Iterate over all relevant cell indexes
@@ -181,7 +183,7 @@ void main() {
     // float alpha = ((instanceId + instanceId/${ROW_COUNT}) % 2 == 0 ? 0.3 : 0.5);
 
     
-    ${GLSL_PATTERN1}
+    ${calcFragColorStr}
 
     FragColor = vec4(red, green, blue, alpha);
 }
@@ -191,5 +193,5 @@ void main() {
     return main_Fragment;
 }
 
-// ${calcFragColorStr}
+
 export { getFragment, GLSL_PATTERN1, GLSL_DEFAULT }
