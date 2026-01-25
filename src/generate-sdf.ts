@@ -76,7 +76,7 @@ const defaultSdfOptions: SdfOptions = {
  * float red = res;
  * float green = res;
  * float blue = res;
- * float alpha = 0.5;
+ * float alpha = res;
  * 
  * ```
  * You must define and assign \`red\`, \`green\`, \`blue\` and \`alpha\`.
@@ -164,7 +164,6 @@ function generateSdf(
         width, height,
         options,
         colCount, cellSize, padCount, stretch,
-        
     );
 }
 

@@ -13,6 +13,12 @@ not supported yet).
 
 Supported path commands: `L, Q, C, H, V, S, T, Z  l, q, c, h, v, s, t, z`
 
+### Example Generated sdf
+![Generated sdf](readme/sdf-s.png)
+
+### Example sdf generated using the parameter `glslRgbaCalcStr` in `generateSdf`
+![Sdf generated using the parameter `glslRgbaCalcStr` in `generateSdf`](readme/sdf-custom.png)
+
 ## Installation
 
 ```cli
